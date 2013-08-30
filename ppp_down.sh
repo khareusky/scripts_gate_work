@@ -17,8 +17,8 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 	### Удаление: чтобы ответ пришедшего запроса извне ушел по тому же интерфейсу ###
 	ip rule del from $PPP_LOCAL table $PPP_IFACE prio 10"`echo $PPP_IFACE | cut -d '0' -f2`"
 
-	### NAT ###
-	/etc/gate/nat.sh
+	### Удаление: NAT POSTROUTING ### для подмены исходного ip адреса на ip адрес сетевого интерфейса
+	iptables -t nat -D POSTROUTING ! -s "$PPP_LOCAL" -o "$PPP_IFACE" -j SNAT --to-source "$PPP_LOCAL"
 
 	### ROUTE ###
 	/etc/gate/route/route_pppoe_down.sh

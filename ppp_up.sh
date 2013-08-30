@@ -13,21 +13,14 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 	### LOG ###
 	echo "`date +%D\ %T` CONNECT PPPoE ($0 | $PPP_IFACE | $PPP_LOCAL )" >> /etc/gate/logs/ppp.log
 
-	### Добавление: чтобы ответ пришедшего запроса извне ушел по тому же интерфейсу ###
-	ip rule add from $PPP_LOCAL table $PPP_IFACE prio 10"`echo $PPP_IFACE | cut -d '0' -f2`"
-	for i in /proc/sys/net/ipv4/conf/*/rp_filter ; do
-	    echo 0 > $i
-	done
-	echo 0 > /proc/sys/net/ipv4/conf/"$PPP_IFACE"/rp_filter
-
 	### CHANNEL DST ###
 	/etc/gate/channel/dst.sh auto
 
 	### ROUTE ###
 	/etc/gate/route/route_pppoe_up.sh
 
-	### NAT ###
-	/etc/gate/nat.sh
+	### NAT POSTROUTING ### для подмены исходного ip адреса на ip адрес сетевого интерфейса
+	iptables -t nat -A POSTROUTING ! -s "$PPP_LOCAL" -o "$PPP_IFACE" -j SNAT --to-source "$PPP_LOCAL"
 
 	### RATE ###
 	/etc/gate/rate/pppoe.sh
