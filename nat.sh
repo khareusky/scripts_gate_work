@@ -9,7 +9,7 @@
  ppp2=ppp102
  ppp3=ppp103
 
- iptables --table nat --flush # очистка всех цепочек в таблице nat
+# iptables --table nat --flush # очистка всех цепочек в таблице nat
 
 ### SNAT #################################################################################
  iptables -t nat -A POSTROUTING -s 10.0.3.0/24 -o "$int" -j SNAT --to-source "`ip addr show $int | grep inet -m 1 | awk '{print $4}'| cut -d '/' -f1`" # доступ wifi в ЛВС

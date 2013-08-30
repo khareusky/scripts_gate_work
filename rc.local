@@ -1,0 +1,30 @@
+#!/bin/sh -e
+#####################################
+# параметры для увеличения быстродействия сети
+/etc/gate/sysctl.sh
+
+# политики сетевой безопасности
+/etc/gate/firewall.sh
+/etc/gate/nat.sh
+# таблица маршрутизации
+/etc/gate/route/route_startup.sh
+
+# распределение по каналам
+/etc/gate/channel/src.sh
+
+# ограничение по скорости
+/etc/gate/rate/int.sh
+
+# протоколирование
+/etc/gate/log.sh
+
+#####################################
+/etc/gate/check_ppp.sh ppp101 2>dev/null&
+sleep 2
+/etc/gate/check_ppp.sh ppp102 2>dev/null&
+sleep 2
+/etc/gate/check_ppp.sh ppp103 2>dev/null&
+sleep 2
+
+#####################################
+exit 0
