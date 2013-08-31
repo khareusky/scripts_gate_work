@@ -59,8 +59,6 @@
  ip rule add from 10.3.0.254 table $ppp3 prio "$(($prio+6))"
 
 ###########################################################
- prio=20000
-
 ### RULES SRC CLEAR ###
  while read line
  do
@@ -69,10 +67,11 @@
 
 ###########################################################
 ### RULES SRC NAT ###
- ip rule add fwmark 0x1/0x1 table $ppp1 prio 20001
- ip rule add fwmark 0x2/0x2 table $ppp2 prio 20002
- ip rule add fwmark 0x2/0x2 table $ppp3 prio 20003
- prio=20004
+ prio=20000
+ ip rule add fwmark 0x1/0x1 table "$ppp1" prio "$(($prio+1))"
+ ip rule add fwmark 0x2/0x2 table "$ppp2" prio "$(($prio+2))"
+ ip rule add fwmark 0x3/0x3 table "$ppp3" prio "$(($prio+3))"
+ prio="$(($prio+4))"
  while read name server passwd ip iface proxy nat pptp channel rate1 rate2 log comment
  do
     if [[ "$channel" == "0" || "$channel" == "*" ]]; then
@@ -92,8 +91,6 @@
     fi
     let "prio = prio + 1"
  done < <(cat /etc/gate/data/chap-secrets | grep -v "^#" | grep "[^[:space:]]")
-
-# ip rule add from 80.237.70.0/24 table $ppp1 prio $prio
  let "prio = prio + 1"
+ 
 ###########################################################
- ip rule show

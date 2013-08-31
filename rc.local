@@ -3,9 +3,11 @@
 # параметры для увеличения быстродействия сети
 /etc/gate/sysctl.sh
 
-# политики сетевой безопасности
-/etc/gate/firewall.sh
-/etc/gate/nat.sh
+ /etc/gate/firewall.sh # политики сетевой безопасности
+ iptables -t nat -A POSTROUTING -s 10.0.3.0/24 -o "$int" -j SNAT --to-source "`ip addr show $int | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" # доступ wifi в ЛВС
+ iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов по каналам, чтобы ответные пакеты на запросы в ЛВС уходили в теже каналы
+ iptables -t mangle -A OUTPUT -j CONNMARK --restore-mark # перезапуск маркировки пакетов по каналам, чтобы ответные пакеты на запросы на шлюз уходили в теже каналы
+
 # таблица маршрутизации
 /etc/gate/route/route_startup.sh
 

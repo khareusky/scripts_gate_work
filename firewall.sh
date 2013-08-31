@@ -1,6 +1,5 @@
 #!/bin/bash
 #########################################################################
-#
 # - сетевая политика безопасности доступа к серверу со стороны ЛВС
 # - сетевая политика безопасности доступа к серверу со стороны сети Интернет
 # - сетевая политика безопасности транзитного траффика с ЛВС в сеть Интернет
@@ -101,13 +100,20 @@
     iptables -A FORWARD_ACCEPT -d "$ip" -j ACCEPT
  done < <(cat /etc/gate/data/dst_ip_nat_accept.txt | grep -v "^#" | grep "[^[:space:]]")
 
-### предоставление доступа для перехода пакетов между сетевыми интерфейсами
+### предоставление доступа для перехода пакетов между сетевыми интерфейсами для проброса из ЛВС в сеть Интернет ###
  iptables -F FORWARD_SNAT
  while read name server passwd ip iface proxy nat temp ; do
     if [ "$nat" == "1" ]; then
         iptables -A FORWARD_SNAT -s $ip -j ACCEPT
     fi
  done < <(cat /etc/gate/data/chap-secrets | grep -v "^#" | grep "[^[:space:]]")
+ 
+### предоставление доступа для перехода пакетов между сетевыми интерфейсами для проброса из сети Интернет в ЛВС ###
+ iptables -F FORWARD_DNAT
+ while read ip_dst dport1 dport2 temp ; do
+    iptables -A FORWARD_DNAT -o "$int" -d "$ip_dst" -p tcp --dport "$dport2" -j ACCEPT
+    iptables -A FORWARD_DNAT -i "$int" -s "$ip_dst" -p tcp --sport "$dport2" -j ACCEPT
+ done < <(cat /etc/gate/data/list_of_dnat.txt | grep -v "^#" | grep "[^[:space:]]")
 
 #########################################################################
  iptables-save

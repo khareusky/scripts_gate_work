@@ -35,8 +35,8 @@ fi
  		if [ "$name" == "1" ]; then
  		    while read line
  		    do
- 			ip rule add to "$line" table $ppp1  prio $prio
- 			let "prio = prio + 1"
+				ip rule add to "$line" table $ppp1  prio $prio
+				let "prio = prio + 1"
  		    done < <(host "$ip" | grep has | awk '{print $4}')
  		else
  		    ip rule add to "$ip" table $ppp1 prio $prio
