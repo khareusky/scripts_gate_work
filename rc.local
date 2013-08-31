@@ -1,32 +1,24 @@
 #!/bin/sh -e
 #####################################
-# параметры для увеличения быстродействия сети
-/etc/gate/sysctl.sh
-
+ /etc/gate/sysctl.sh # для подключения необходимых модулей, для настройки системы, для увеличения быстродействия сети
  /etc/gate/firewall.sh # политики сетевой безопасности
  iptables -t nat -A POSTROUTING -s 10.0.3.0/24 -o "$int" -j SNAT --to-source "`ip addr show $int | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" # доступ wifi в ЛВС
  iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов по каналам, чтобы ответные пакеты на запросы в ЛВС уходили в теже каналы
  iptables -t mangle -A OUTPUT -j CONNMARK --restore-mark # перезапуск маркировки пакетов по каналам, чтобы ответные пакеты на запросы на шлюз уходили в теже каналы
 
-# таблица маршрутизации
-/etc/gate/route/route_startup.sh
-
-# распределение по каналам
-/etc/gate/channel/src.sh
-
-# ограничение по скорости
-/etc/gate/rate/int.sh
-
-# протоколирование
-/etc/gate/log.sh
+ /etc/gate/route/route_startup.sh # таблица маршрутизации
+ /etc/gate/channel/src.sh # распределение по каналам
+ /etc/gate/rate/int.sh # ограничение по скорости
+ /etc/gate/log.sh # протоколирование запросов в сеть Интернет
 
 #####################################
-/etc/gate/check_ppp.sh ppp101 2>dev/null&
-sleep 2
-/etc/gate/check_ppp.sh ppp102 2>dev/null&
-sleep 2
-/etc/gate/check_ppp.sh ppp103 2>dev/null&
-sleep 2
+# Запуск скриптов для поддержания подключений в активном состоянии с помощью пинга
+ /etc/gate/check_ppp.sh ppp101 2>/dev/null&
+ sleep 2
+ /etc/gate/check_ppp.sh ppp102 2>/dev/null&
+ sleep 2
+ /etc/gate/check_ppp.sh ppp103 2>/dev/null&
+ sleep 2
 
 #####################################
 exit 0
