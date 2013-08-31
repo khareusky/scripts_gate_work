@@ -7,9 +7,9 @@
 
  /etc/gate/sysctl.sh # для подключения необходимых модулей, для настройки системы, для увеличения быстродействия сети
  /etc/gate/firewall.sh # политики сетевой безопасности
- iptables -t nat -A POSTROUTING -s 10.0.3.0/24 -o "$int" -j SNAT --to-source "`ip addr show $int | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" # доступ wifi в ЛВС
- iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов по каналам, чтобы ответные пакеты на запросы в ЛВС уходили в теже каналы
- iptables -t mangle -A OUTPUT -j CONNMARK --restore-mark # перезапуск маркировки пакетов по каналам, чтобы ответные пакеты на запросы на шлюз уходили в теже каналы
+ iptables -t nat -A POSTROUTING -s 10.0.3.0/24 -o "$int" -j SNAT --to-source "`ip addr show $int | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" # для подмены исходного ip адреса пакетов WIFI сети на ip адрес сетевого интерфейса сети Интернет
+ iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет в ЛВС) перенаправлялись на теже Интернет-каналы
+ iptables -t mangle -A OUTPUT -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет на Шлюз) перенаправлялись на теже Интернет-каналы
 
  /etc/gate/route/route_startup.sh # таблица маршрутизации
  /etc/gate/channel/src.sh # распределение по каналам
