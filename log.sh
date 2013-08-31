@@ -19,7 +19,7 @@
  	if [[ "$log" == "1" && "$nat" == "1" ]]; then
  		iptables -t mangle -A FORWARD_LOG -s $ip -j ULOG --ulog-cprange 40
  	fi
- done < <(cat /etc/gate/data/chap-secrets | grep -v "^#" | grep "[^[:space:]]")
+ done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 ############################################################
  iptables-save

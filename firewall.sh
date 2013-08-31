@@ -84,7 +84,7 @@
     if [ "$pptp" == "1" ]; then
         iptables -A INPUT_PPTP -s $ip -j ACCEPT
     fi
- done < <(cat /etc/gate/data/chap-secrets | grep -v "^#" | grep "[^[:space:]]")
+ done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 #########################
  iptables -F FORWARD_DROP
@@ -106,7 +106,7 @@
     if [ "$nat" == "1" ]; then
         iptables -A FORWARD_SNAT -s $ip -j ACCEPT
     fi
- done < <(cat /etc/gate/data/chap-secrets | grep -v "^#" | grep "[^[:space:]]")
+ done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
  
 ### предоставление доступа для перехода пакетов между сетевыми интерфейсами для проброса из сети Интернет в ЛВС ###
  iptables -F FORWARD_DNAT

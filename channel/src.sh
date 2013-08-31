@@ -41,7 +41,7 @@
  		echo $ip >> /etc/squid3/third_channel_src.txt
  		continue
  	fi
- done < <(cat /etc/gate/data/chap-secrets | grep -v "^#" | grep "[^[:space:]]")
+ done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
  a=$(cat /var/run/squid3.pid 2>/dev/null)
  if [ "$a" == "" ]; then
@@ -88,7 +88,7 @@
         ip rule add from "$ip" table $ppp3 prio $prio
     fi
     let "prio = prio + 1"
- done < <(cat /etc/gate/data/chap-secrets | grep -v "^#" | grep "[^[:space:]]")
+ done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
  let "prio = prio + 1"
  
 ###########################################################
