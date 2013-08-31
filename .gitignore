@@ -1,7 +1,9 @@
 /data
 /temp
-/squid3
+#/squid3
 /ppp
 /logs
 /bind
+
+*.txt
 
