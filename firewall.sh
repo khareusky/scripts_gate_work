@@ -101,5 +101,13 @@
     iptables -A FORWARD_ACCEPT -d "$ip" -j ACCEPT
  done < <(cat /etc/gate/data/dst_ip_nat_accept.txt | grep -v "^#" | grep "[^[:space:]]")
 
+### предоставление доступа для перехода пакетов между сетевыми интерфейсами
+ iptables -F FORWARD_SNAT
+ while read name server passwd ip iface proxy nat temp ; do
+    if [ "$nat" == "1" ]; then
+        iptables -A FORWARD_SNAT -s $ip -j ACCEPT
+    fi
+ done < <(cat /etc/gate/data/chap-secrets | grep -v "^#" | grep "[^[:space:]]")
+
 #########################################################################
  iptables-save
