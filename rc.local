@@ -1,5 +1,10 @@
 #!/bin/sh -e
 #####################################
+ int=eth3
+ ppp1=ppp101
+ ppp2=ppp102
+ ppp3=ppp103
+
  /etc/gate/sysctl.sh # для подключения необходимых модулей, для настройки системы, для увеличения быстродействия сети
  /etc/gate/firewall.sh # политики сетевой безопасности
  iptables -t nat -A POSTROUTING -s 10.0.3.0/24 -o "$int" -j SNAT --to-source "`ip addr show $int | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" # доступ wifi в ЛВС
@@ -13,11 +18,11 @@
 
 #####################################
 # Запуск скриптов для поддержания подключений в активном состоянии с помощью пинга
- /etc/gate/check_ppp.sh ppp101 2>/dev/null&
+ /etc/gate/check_ppp.sh "$ppp1" 2>/dev/null&
  sleep 2
- /etc/gate/check_ppp.sh ppp102 2>/dev/null&
+ /etc/gate/check_ppp.sh "$ppp2" 2>/dev/null&
  sleep 2
- /etc/gate/check_ppp.sh ppp103 2>/dev/null&
+ /etc/gate/check_ppp.sh "$ppp3" 2>/dev/null&
  sleep 2
 
 #####################################
