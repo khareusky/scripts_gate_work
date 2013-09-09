@@ -1,11 +1,9 @@
 #!/bin/bash
-################################################################
-#
+#################################################################
 # - ограничение пропускной способности компьютеров ЛВС как входного траффика так и выходного
 # - приоритезация исходящего и входящего траффика на внутреннем интерфейсе шлюза
-#
 ################################################################
- int=eth3
+ source /etc/gate/global.sh
  rate_down_default=2500
  rate_up_default=150
  uid=10
@@ -64,11 +62,8 @@
         tc filter add dev $int protocol ip parent 1:0 prio 2 u32 match ip dst $ip match ip sport 3128 0xffff classid 1:"$(($uid+2))" # squid
         tc filter add dev $int protocol ip parent 1:0 prio 2 u32 match ip dst $ip match ip sport 8118 0xffff classid 1:"$(($uid+2))" # privoxy
         tc filter add dev $int protocol ip parent 1:0 prio 2 u32 match ip dst $ip match ip sport 9050 0xffff classid 1:"$(($uid+2))" # tor
-        tc filter add dev $int protocol ip parent 1:0 prio 2 u32 match ip dst $ip match ip sport 8080 0xffff classid 1:"$(($uid+2))" # torrent
 
-        tc filter add dev $int protocol ip parent 1:0 prio 3 u32 match ip dst $ip match ip sport 445 0xffff classid 1:5 # netbios
-        tc filter add dev $int protocol ip parent 1:0 prio 3 u32 match ip dst $ip match ip protocol 0x2f 0xff classid 1:"$(($uid+3))" # pptp
-        
+        tc filter add dev $int protocol ip parent 1:0 prio 3 u32 match ip dst $ip match ip protocol 0x2f 0xff classid 1:"$(($uid+3))" # pptp        
         tc filter add dev $int protocol ip parent 1:0 prio 3 u32 match ip dst $ip classid 1:"$(($uid+3))" # all
 
     ### UP ###
@@ -90,8 +85,7 @@
         tc filter add dev ifb0 protocol ip parent 1:0 prio 2 u32 match ip src $ip match ip dport 3128 0xffff classid 1:"$(($uid+2))" # squid
         tc filter add dev ifb0 protocol ip parent 1:0 prio 2 u32 match ip src $ip match ip dport 8118 0xffff classid 1:"$(($uid+2))" # privoxy
         tc filter add dev ifb0 protocol ip parent 1:0 prio 2 u32 match ip src $ip match ip dport 9050 0xffff classid 1:"$(($uid+2))" # tor
-        tc filter add dev ifb0 protocol ip parent 1:0 prio 2 u32 match ip src $ip match ip dport 8080 0xffff classid 1:"$(($uid+2))" # torrent
-
+        
         tc filter add dev ifb0 protocol ip parent 1:0 prio 3 u32 match ip src $ip match ip protocol 0x2f 0xff classid 1:"$(($uid+3))" # pptp
         tc filter add dev ifb0 protocol ip parent 1:0 prio 3 u32 match ip src $ip classid 1:"$(($uid+3))" # all
         let "uid = uid + 4"

@@ -12,3 +12,6 @@ ppp3="ppp103"
 ssh_port="1786"
 
 log_file="/var/log/gate.log"
+squid_first_channel_src="/etc/gate/data/squid3_first_channel_src.txt"
+squid_second_channel_src="/etc/gate/data/squid3_second_channel_src.txt"
+squid_third_channel_src="/etc/gate/data/squid3_third_channel_src.txt"

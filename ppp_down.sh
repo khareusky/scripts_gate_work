@@ -8,9 +8,6 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 	### LOG ###
 	echo "`date +%D\ %T` $0: DISCONNECT PPPoE ($PPP_IFACE | $PPP_LOCAL)" >> "$log_file"
 
-	### Удаление: чтобы ответ пришедшего запроса извне ушел по тому же интерфейсу ###
-	ip rule del from $PPP_LOCAL table $PPP_IFACE prio 10"`echo $PPP_IFACE | cut -d '0' -f2`"
-
 	### SNAT: Удаление: для подмены исходного ip адреса пакетов на ip адрес сетевого интерфейса для проброса из ЛВС в сеть Интернет ###
 	iptables -t nat -D POSTROUTING ! -s "$PPP_LOCAL" -o "$PPP_IFACE" -j SNAT --to-source "$PPP_LOCAL"
 
@@ -25,6 +22,9 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 	
 	### ROUTE ###
 	/etc/gate/route/route_pppoe_down.sh
+	
+	### Сбросить кеш таблиц маршрутизации отключившегося канала
+	conntrack -D -q $PPP_LOCAL
 	
 	### DNS ###
 	if [ "$PPP_IFACE" == "$ppp2" ] ; then
