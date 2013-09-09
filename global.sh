@@ -11,4 +11,4 @@ ppp3="ppp103"
 
 ssh_port="1786"
 
-log_file="/etc/gate/logs/ppp.log"
+log_file="/var/log/gate.log"

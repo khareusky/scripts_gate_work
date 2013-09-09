@@ -1,7 +1,11 @@
 #!/bin/bash
+#########################################################################
+# скрипт для запуск и проверки функционирования PPPoE каналов
+#########################################################################
+source /etc/gate/global.sh
 
 log() {
-    echo "`date +%D\ %T` $@" >> /etc/gate/logs/ppp.log;
+    echo "`date +%D\ %T` $0: $@" >> "$log_file";
 }
 
 kill_ppp() {
@@ -36,19 +40,19 @@ iface="$1"
 
 # проверка на запущенность #
 if [[ `ps uax | grep -v grep | grep -c "/bin/bash /etc/gate/check_ppp.sh $iface" 2>/dev/null` != "2" ]]; then
-    log "checking of the $iface is doubled"
+    log "checking of the $iface is doubled, exit"
     exit 0
 fi
 
 while [ true ];
 do
     if [[ `ip addr show "$iface" 2>/dev/null` ]]; then
-        log "ping $iface: START";
+        log "START ping $iface";
         ip="`ip addr show $iface | grep inet -m 1| awk '{print $4}'| cut -d '/' -f1`"
         while [ true ]; do
             ping -I "$iface" -s 1 -W 1 -c 5 -i 1 "$ip" >/dev/null || break;
         done
-        log "ping $iface: STOP";
+        log "STOP ping $iface";
         kill_ppp "$iface"
     else
         kill_ppp "$iface"

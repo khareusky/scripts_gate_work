@@ -6,7 +6,7 @@ source /etc/gate/global.sh
 
 if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$ppp3" ]]; then
 	### LOG ###
-	echo "`date +%D\ %T` DISCONNECT PPPoE ($0 | $PPP_IFACE | $PPP_LOCAL)" >> "$log_file"
+	echo "`date +%D\ %T` $0: DISCONNECT PPPoE ($PPP_IFACE | $PPP_LOCAL)" >> "$log_file"
 
 	### Удаление: чтобы ответ пришедшего запроса извне ушел по тому же интерфейсу ###
 	ip rule del from $PPP_LOCAL table $PPP_IFACE prio 10"`echo $PPP_IFACE | cut -d '0' -f2`"
@@ -14,12 +14,8 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 	### SNAT: Удаление: для подмены исходного ip адреса пакетов на ip адрес сетевого интерфейса для проброса из ЛВС в сеть Интернет ###
 	iptables -t nat -D POSTROUTING ! -s "$PPP_LOCAL" -o "$PPP_IFACE" -j SNAT --to-source "$PPP_LOCAL"
 
-<<<<<<< Updated upstream
-	while read ip_dst dport1 dport2 temp ; do
-=======
 	### DNAT ###
 	while read dport1 ip_dst dport2 temp ; do
->>>>>>> Stashed changes
 		### DNAT: Удаление: для подмены ip адреса назначения пакетов на ip адрес требуемого компьютера для проброса из сети Интернет в ЛВС ###
 		iptables -t nat -D PREROUTING -i "$PPP_IFACE" -p tcp -m tcp --dport "$dport1" -j DNAT --to-destination "$ip_dst":"$dport2" 
 		
@@ -37,7 +33,7 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 	fi
 else
 	### LOG ###
-	echo "`date +%D\ %T` DISCONNECT PPTP ($0 | $PPP_IFACE | $PPP_REMOTE | $PPP_IPPARAM | $PEERNAME)" >> /mnt/sdb1/logs/ppp.log
+	echo "`date +%D\ %T` $0: DISCONNECT PPTP ($PPP_IFACE | $PPP_REMOTE | $PPP_IPPARAM | $PEERNAME)" >> "$log_file"
 
 	### CHECK ###
 	rm /var/run/pptpd-users/$PEERNAME
