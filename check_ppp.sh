@@ -1,7 +1,7 @@
 #!/bin/bash
 
 log() {
-    echo "`date +%D\ %T` $@" >> /mnt/sdb1/logs/ppp.log;
+    echo "`date +%D\ %T` $@" >> /etc/gate/logs/ppp.log;
 }
 
 kill_ppp() {
