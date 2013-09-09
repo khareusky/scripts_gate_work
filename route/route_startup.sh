@@ -1,11 +1,7 @@
 #!/bin/bash
 ########################################################################
- int=eth3
- ext1=eth0
- ext2=eth1
- ext3=eth2
+source /etc/gate/global.sh
 
-########################################################################
  count=`ip rule | grep -c "lookup static"`
  for ((i=1;i<=count;i++)); do
      ip rule del table static
@@ -19,6 +15,3 @@
  ip route add 10.1.0.0/24 dev $int src 10.1.0.254 table static
  ip route add 10.2.0.0/24 dev $int src 10.2.0.254 table static
  ip route add 10.3.0.0/24 dev $int src 10.3.0.254 table static
-
-#########################################################################
- ip route ls table static
