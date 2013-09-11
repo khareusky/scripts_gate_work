@@ -16,3 +16,5 @@ while [ true ]; do
     echo "`date +%D\ %T` $0: DISCONNECT SSH FROM 80.237.70.158" >> "$log_file"
     sleep 30;
 done
+
+############################################################

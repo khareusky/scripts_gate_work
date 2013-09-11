@@ -28,16 +28,17 @@
  ip rule add from 10.1.0.254 table "$ppp1" prio 501
  ip rule add from 10.2.0.254 table "$ppp2" prio 502
  ip rule add from 10.3.0.254 table "$ppp3" prio 503
- 
+
 # правила, чтобы пакеты уходили в те каналы, откуда пришли
  ip rule add fwmark 0x1/0x1 table "$ppp1" prio 504
  ip rule add fwmark 0x2/0x2 table "$ppp2" prio 505
  ip rule add fwmark 0x3/0x3 table "$ppp3" prio 506
- 
+
 #####################################
- /etc/gate/channel/src.sh # распределение по каналам
+ /etc/gate/channel/src.sh # распределение по каналам компьютеров ЛВС
  /etc/gate/rate/int.sh # ограничение по скорости
  /etc/gate/log.sh # протоколирование запросов в сеть Интернет
+ /etc/gate/ssh_connect.sh& # поднимаем ssh подключение, через которое будем получать доступ к данному шлюзу
 
 #####################################
 # Запуск скриптов для поддержания подключений в активном состоянии с помощью пинга

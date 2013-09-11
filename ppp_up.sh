@@ -6,7 +6,7 @@ source /etc/gate/global.sh
 
 if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$ppp3" ]]; then # если канал является интернетовским
 	### LOG ###
-	echo "`date +%D\ %T` $0: CONNECT PPPoE ($PPP_IFACE | $PPP_LOCAL )" >> "$log_file"
+	echo "`date +%D\ %T` $0: CONNECT $PPP_IFACE: local ip = $PPP_LOCAL; remote ip = $PPP_REMOTE; dns1 = $DNS1; dns2 = $DNS2;" >> "$log_file"
 
 	### CHANNEL DST ###
 	#/etc/gate/channel/dst.sh auto
@@ -52,20 +52,5 @@ else
 	### RATE ###
 	/etc/gate/rate/pptp.sh
 fi
-
-##########################################
-# проверка на первое подключение к сети Интернет
- PPP_REMOTE1="`ip addr show $ppp1|grep inet -m 1| awk '{print $4}'| cut -d '/' -f1`"
- PPP_REMOTE2="`ip addr show $ppp2|grep inet -m 1| awk '{print $4}'| cut -d '/' -f1`"
- PPP_REMOTE3="`ip addr show $ppp3|grep inet -m 1| awk '{print $4}'| cut -d '/' -f1`"
- if [[ "$PPP_REMOTE1" != "" && "$PPP_REMOTE2" == "" && "$PPP_REMOTE3" == "" ]]; then
-    /etc/gate/internet_up.sh
- fi
- if [[ "$PPP_REMOTE1" == "" && "$PPP_REMOTE2" != "" && "$PPP_REMOTE3" == "" ]]; then
-    /etc/gate/internet_up.sh
- fi
- if [[ "$PPP_REMOTE1" == "" && "$PPP_REMOTE2" == "" && "$PPP_REMOTE3" != "" ]]; then
-    /etc/gate/internet_up.sh
- fi
 
 ##########################################
