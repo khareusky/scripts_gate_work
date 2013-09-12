@@ -1,39 +1,78 @@
 #!/bin/sh -e
 #####################################
 . /etc/gate/global.sh # подключение файла с переменными
-
-#####################################
  /etc/gate/sysctl.sh # для подключения необходимых модулей, для настройки системы, для увеличения быстродействия сети
- /etc/gate/firewall.sh # политики сетевой безопасности
- iptables -t nat -A POSTROUTING -o "$int" -s 10.0.3.0/24 -j SNAT --to-source "`ip addr show $int | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" # для подмены исходного ip адреса пакетов WIFI сети на ip адрес сетевого интерфейса сети Интернет
- iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет в ЛВС) перенаправлялись на теже Интернет-каналы
-# iptables -t mangle -A OUTPUT -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет на Шлюз) перенаправлялись на теже Интернет-каналы
+ 
+#####################################
+# ЛВС
+ ip rule add to 10.0.0.0/24 table main prio 20
+ 
+# создание пользовательских цепочек
+ iptables -N INPUT_PROXY 
+ iptables -N INPUT_PPTP
+ iptables -N FORWARD_DROP
+ iptables -N FORWARD_ACCEPT
+ iptables -N FORWARD_SNAT
+ iptables -N FORWARD_DNAT
+ 
+ ### FILTER INPUT ###
+ iptables -P INPUT DROP # состояние по-умолчанию, когда ни одно из правил не сработало
+ iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT # пропускать те пакеты, которые уже подключились
+ iptables -A INPUT -p tcp --dport "$ssh_port" -j ACCEPT # ssh
+ iptables -A INPUT -i lo -j ACCEPT
+
+ iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p tcp --dport 3128 -j INPUT_PROXY # squid
+ iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p udp --dport 53 -j ACCEPT # dns
+ iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p tcp --dport 8118 -j ACCEPT # privoxy
+ iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p tcp --dport 9050 -j ACCEPT # tor
+ iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p tcp --dport 1723 -j INPUT_PPTP # для подключения pptp
+ iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p gre -j INPUT_PPTP # для подключения pptp
+ iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p icmp -j ACCEPT # icmp
+
+ iptables -A INPUT -s 172.25.12.0/24 -p tcp --dport 3128 -j INPUT_PROXY # squid pptp
+ iptables -A INPUT -s 172.25.12.0/24 -p udp --dport 53 -j ACCEPT # dns pptp
+ iptables -A INPUT -s 172.25.12.0/24 -p icmp -j ACCEPT # icmp pptp
+
+### FILTER FORWARD ###
+ iptables -P FORWARD DROP # состояние по-умолчанию, когда ни одно из правил не сработало
+ iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT # пропускать те пакеты, которые уже подключились
+
+ iptables -A FORWARD -j FORWARD_DROP # список запрещенных ip адресов
+ iptables -A FORWARD -j FORWARD_ACCEPT # список строк, к которым будет разрешен прямой доступ по NAT (SNAT)
+ iptables -A FORWARD -j FORWARD_DNAT # список тех внутренних ресурсов ЛВС, к которым будет разрешен доступ извне (DNAT)
+ iptables -A FORWARD -i "$int" -j FORWARD_SNAT # список ip адресов ЛВС, кому будет разрешен доступ в сеть Интернет по технологии NAT 
+
+### FILTER OUTPUT ###
+ iptables -P OUTPUT ACCEPT # состояние по-умолчанию, когда ни одно из правил не сработало
+ iptables -A OUTPUT -j FORWARD_DROP
+ 
+ /etc/gate/firewall.sh # циклы по записи хостов в пользовательские цепочки
+ /etc/gate/channel/src.sh # распределение по каналам компьютеров ЛВС
+ 
+#####################################
+# заполнение пользовательской таблицы маршрутизации "static"
+ ip rule add table static prio 10
+ ip route add 10.0.0.0/24 dev "$int" src 10.0.0.1 table static
+ 
+##################################### 
+# протоколирование
  iptables -t mangle -N FORWARD_LOG # цепочка для протоколирования хостов
  iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu # принудительная корректировка MSS в пакетах всего транзитного траффика
  iptables -t mangle -A FORWARD -i "$int" -s 10.0.0.0/24 -m state --state NEW -j FORWARD_LOG # протоколирование компьютеров ЛВС у кого NAT
  iptables -t mangle -A FORWARD -i "$wifi" ! -o "$int" -s 10.0.3.0/24 -m state --state NEW -j ULOG --ulog-cprange 40 # протоколирование WIFI
+ /etc/gate/log.sh # цикл записи хостов в FORWARD_LOG
 
 #####################################
-# заполнение пользовательской таблицы маршрутизации "static"
- ip rule add table static prio 50 # добавление правила для перенаправление в данную таблицу
- ip route add 10.0.0.0/24 dev "$int" src 10.0.0.1 table static
- ip route add 10.0.1.0/24 dev "$ext1" src 10.0.1.254 table static
- ip route add 10.0.2.0/24 dev "$ext2" src 10.0.2.254 table static
- ip route add 10.0.3.0/24 dev "$ext3" src 10.0.3.254 table static
- ip route add 10.1.0.0/24 dev "$int" src 10.1.0.254 table static
- ip route add 10.2.0.0/24 dev "$int" src 10.2.0.254 table static
- ip route add 10.3.0.0/24 dev "$int" src 10.3.0.254 table static
+# правила для wifi
+ ip rule add from 10.0.3.0/24 to 10.0.0.0/24 table main prio 40
+ ip rule add from 10.0.3.0/24 table "$ppp2" prio 41
+ iptables -A INPUT -i "$wifi" -s 10.0.3.0/24 -p udp --dport 53 -j ACCEPT # dns for WIFI
+ iptables -A INPUT -i "$wifi" -s 10.0.3.0/24 -p udp --dport 67 -j ACCEPT # dhcp for WIFI
+ iptables -A INPUT -i "$wifi" -s 10.0.3.0/24 -p icmp -j ACCEPT # icmp
+ iptables -A FORWARD -i "$wifi" -s 10.0.3.0/24 -j ACCEPT # открытие доступа для wifi
+ iptables -t nat -A POSTROUTING -o "$int" -s 10.0.3.0/24 -d 10.0.0.0/24 -j SNAT --to-source "`ip addr show $int | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" # SNAT wifi в ЛВС
 
-# распределение по каналам для SQUID
- ip rule add from 10.1.0.254 table "$ppp1" prio 50`echo -n "$ppp1" | tail -c 1`
- ip rule add from 10.2.0.254 table "$ppp2" prio 50`echo -n "$ppp2" | tail -c 1`
- ip rule add from 10.3.0.254 table "$ppp3" prio 50`echo -n "$ppp3" | tail -c 1`
-
-# правила, чтобы пакеты уходили в те каналы, откуда пришли
- ip rule add fwmark 0x1/0x1 table "$ppp1" prio 60`echo -n "$ppp1" | tail -c 1`
- ip rule add fwmark 0x2/0x2 table "$ppp2" prio 60`echo -n "$ppp2" | tail -c 1`
- ip rule add fwmark 0x3/0x3 table "$ppp3" prio 60`echo -n "$ppp3" | tail -c 1`
-
+#####################################
 # правила для модемов
  ip rule add to 10.0.1.1 table main prio 51
  ip rule add to 10.0.2.1 table main prio 52
@@ -41,18 +80,36 @@
  ip rule add from 10.0.1.1 table main prio 54
  ip rule add from 10.0.2.1 table main prio 55
  ip rule add from 10.0.3.1 table main prio 56
+ iptables -A FORWARD -o "$ext1" -d 10.0.1.1 -j ACCEPT
+ iptables -A FORWARD -o "$ext2" -d 10.0.2.1 -j ACCEPT
+ iptables -A FORWARD -o "$ext3" -d 10.0.3.1 -j ACCEPT
  iptables -t nat -A POSTROUTING -o "$ext1" -d 10.0.1.1 -j SNAT --to-source "`ip addr show $ext1 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`"
  iptables -t nat -A POSTROUTING -o "$ext2" -d 10.0.2.1 -j SNAT --to-source "`ip addr show $ext2 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`"
  iptables -t nat -A POSTROUTING -o "$ext3" -d 10.0.3.1 -j SNAT --to-source "`ip addr show $ext3 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`"
 
+##################################### 
+# распределение по каналам для SQUID
+ ip rule add table static prio 10
+ ip rule add from 10.1.0.254 table "$ppp1" prio 6`echo -n "$ppp1" | tail -c 1`
+ ip rule add from 10.2.0.254 table "$ppp2" prio 6`echo -n "$ppp2" | tail -c 1`
+ ip rule add from 10.3.0.254 table "$ppp3" prio 6`echo -n "$ppp3" | tail -c 1`
+ ip route add 10.1.0.0/24 dev "$int" src 10.1.0.254 table static
+ ip route add 10.2.0.0/24 dev "$int" src 10.2.0.254 table static
+ ip route add 10.3.0.0/24 dev "$int" src 10.3.0.254 table static
+
+##################################### 
+# правила, чтобы пакеты уходили в те каналы, откуда пришли
+ iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет в ЛВС) перенаправлялись на теже Интернет-каналы
+ ip rule add fwmark 0x1/0x1 table "$ppp1" prio 7`echo -n "$ppp1" | tail -c 1`
+ ip rule add fwmark 0x2/0x2 table "$ppp2" prio 7`echo -n "$ppp2" | tail -c 1`
+ ip rule add fwmark 0x3/0x3 table "$ppp3" prio 7`echo -n "$ppp3" | tail -c 1`
+
 #####################################
- /etc/gate/channel/src.sh # распределение по каналам компьютеров ЛВС
  /etc/gate/rate/int.sh # ограничение по скорости
- /etc/gate/log.sh # протоколирование запросов в сеть Интернет
  /etc/gate/ssh_connect.sh& # поднимаем ssh подключение, через которое будем получать доступ к данному шлюзу
 
 #####################################
-# Запуск скриптов для поддержания подключений в активном состоянии с помощью пинга
+# скрипты для поддержания подключений в активном состоянии с помощью пинга
  /etc/gate/check_ppp.sh "$ppp1" 2>/dev/null&
  sleep 2
  /etc/gate/check_ppp.sh "$ppp2" 2>/dev/null&

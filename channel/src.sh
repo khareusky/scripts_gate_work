@@ -17,10 +17,9 @@
  
 # заполнение файлов
  while read name server passwd ip iface proxy nat pptp channel temp; do
- 	if [[ "$channel" == "0" || "$channel" == "*" || "$proxy" == "0" ]]; then
+	if [[ "$proxy" != "1" ]]; then
  	    continue
  	fi
-
  	if [[ "$channel" == "$ppp1" ]]; then
  		echo $ip >> "$squid_first_channel_src"
 	else if [[ "$channel" == "$ppp2" ]]; then
@@ -37,8 +36,9 @@
  else
  	/etc/init.d/squid3 reload
  fi
+ 
 ###########################################################
-### RULES SRC NAT ### 
+### NAT ### 
 # очистка правил для NAT 
  while read line; do
     ip rule del prio "$line"
@@ -47,7 +47,10 @@
 # заполнения правил для тех, у кого NAT 
  prio=20000
  while read name server passwd ip iface proxy nat pptp channel temp; do
-    if [[ "$channel" != "0" && "$channel" != "*" && "$nat" == "1" ]]; then
+	if [[ "$nat" != "1" ]]; then
+ 	    continue
+ 	fi
+    if [[ "$channel" == "$ppp1" || "$channel" == "$ppp2" || "$channel" == "$ppp3" ]]; then
         ip rule add from "$ip" table "$channel" prio "$prio"
 		let "prio = prio + 1"
     fi	

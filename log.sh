@@ -1,10 +1,9 @@
 #!/bin/bash
 #################################################################
-# Протоколирование транзитного траффика с ЛВС в сеть Интернет (NAT)
+# Заполнение пользовательской цепочки FORWARD_LOG хостами ЛВС для протоколирования
 #################################################################
 
-# заполнение пользовательской цепочки хостами ЛВС
- iptables -t mangle -F FORWARD_LOG
+ iptables -t mangle -F FORWARD_LOG # очистка цепочки
  while read name server passwd ip iface proxy nat pptp channel rate1 rate2 log temp; do
  	if [[ "$log" == "1" && "$nat" == "1" ]]; then
  		iptables -t mangle -A FORWARD_LOG -s "$ip" -j ULOG --ulog-cprange 40
