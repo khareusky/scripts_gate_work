@@ -7,7 +7,7 @@
  /etc/gate/firewall.sh # политики сетевой безопасности
  iptables -t nat -A POSTROUTING -o "$int" -s 10.0.3.0/24 -j SNAT --to-source "`ip addr show $int | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" # для подмены исходного ip адреса пакетов WIFI сети на ip адрес сетевого интерфейса сети Интернет
  iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет в ЛВС) перенаправлялись на теже Интернет-каналы
- iptables -t mangle -A OUTPUT -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет на Шлюз) перенаправлялись на теже Интернет-каналы
+# iptables -t mangle -A OUTPUT -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет на Шлюз) перенаправлялись на теже Интернет-каналы
  iptables -t mangle -N FORWARD_LOG # цепочка для протоколирования хостов
  iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu # принудительная корректировка MSS в пакетах всего транзитного траффика
  iptables -t mangle -A FORWARD -i "$int" -s 10.0.0.0/24 -m state --state NEW -j FORWARD_LOG # протоколирование компьютеров ЛВС у кого NAT
@@ -15,7 +15,7 @@
 
 #####################################
 # заполнение пользовательской таблицы маршрутизации "static"
- ip rule add table static prio 1 # добавление правила для перенаправление в данную таблицу
+ ip rule add table static prio 50 # добавление правила для перенаправление в данную таблицу
  ip route add 10.0.0.0/24 dev "$int" src 10.0.0.1 table static
  ip route add 10.0.1.0/24 dev "$ext1" src 10.0.1.254 table static
  ip route add 10.0.2.0/24 dev "$ext2" src 10.0.2.254 table static
@@ -25,14 +25,25 @@
  ip route add 10.3.0.0/24 dev "$int" src 10.3.0.254 table static
 
 # распределение по каналам для SQUID
- ip rule add from 10.1.0.254 table "$ppp1" prio 501
- ip rule add from 10.2.0.254 table "$ppp2" prio 502
- ip rule add from 10.3.0.254 table "$ppp3" prio 503
+ ip rule add from 10.1.0.254 table "$ppp1" prio 50`echo -n "$ppp1" | tail -c 1`
+ ip rule add from 10.2.0.254 table "$ppp2" prio 50`echo -n "$ppp2" | tail -c 1`
+ ip rule add from 10.3.0.254 table "$ppp3" prio 50`echo -n "$ppp3" | tail -c 1`
 
 # правила, чтобы пакеты уходили в те каналы, откуда пришли
- ip rule add fwmark 0x1/0x1 table "$ppp1" prio 504
- ip rule add fwmark 0x2/0x2 table "$ppp2" prio 505
- ip rule add fwmark 0x3/0x3 table "$ppp3" prio 506
+ ip rule add fwmark 0x1/0x1 table "$ppp1" prio 60`echo -n "$ppp1" | tail -c 1`
+ ip rule add fwmark 0x2/0x2 table "$ppp2" prio 60`echo -n "$ppp2" | tail -c 1`
+ ip rule add fwmark 0x3/0x3 table "$ppp3" prio 60`echo -n "$ppp3" | tail -c 1`
+
+# правила для модемов
+ ip rule add to 10.0.1.1 table main prio 51
+ ip rule add to 10.0.2.1 table main prio 52
+ ip rule add to 10.0.3.1 table main prio 53
+ ip rule add from 10.0.1.1 table main prio 54
+ ip rule add from 10.0.2.1 table main prio 55
+ ip rule add from 10.0.3.1 table main prio 56
+ iptables -t nat -A POSTROUTING -o "$ext1" -d 10.0.1.1 -j SNAT --to-source "`ip addr show $ext1 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`"
+ iptables -t nat -A POSTROUTING -o "$ext2" -d 10.0.2.1 -j SNAT --to-source "`ip addr show $ext2 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`"
+ iptables -t nat -A POSTROUTING -o "$ext3" -d 10.0.3.1 -j SNAT --to-source "`ip addr show $ext3 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`"
 
 #####################################
  /etc/gate/channel/src.sh # распределение по каналам компьютеров ЛВС

@@ -9,6 +9,10 @@ source /etc/gate/global.sh
  PPP_REMOTE3="`ip addr show $ppp3|grep inet -m 1| awk '{print $4}'| cut -d '/' -f1`"
 
 ########################################################################
+### Если идет обращение непосредственно к шлюзу, то ответные пакеты по тому же каналу ###
+ ip rule add from "$PPP_LOCAL" table "$PPP_IFACE" prio `echo -n "$PPP_IFACE" | tail -c 3`
+
+########################################################################
 ### TABLE "static" ###
  ip route add $PPP_REMOTE dev $PPP_IFACE src $PPP_LOCAL table static
  ip route flush cache table static
