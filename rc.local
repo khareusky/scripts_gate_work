@@ -73,6 +73,11 @@
  /etc/gate/dnat.sh # заполнение цепочек данными
 
 #####################################
+# Распределение по каналам
+ /etc/gate/channel_src.sh
+ /etc/gate/channel_dst.sh
+
+#####################################
 # ACCEPT DST IP
  iptables -N FORWARD_ACCEPT
  iptables -A FORWARD -j FORWARD_ACCEPT # список строк, к которым будет разрешен прямой доступ по NAT (SNAT)

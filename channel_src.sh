@@ -1,8 +1,8 @@
 #!/bin/bash
 ###########################################################
-# Принудительное перенаправление на определенный канал сети Интернета по исходящему адресу хоста
+# Распределение хостов по каналам
 ###########################################################
- source /etc/gate/global.sh
+source /etc/gate/global.sh
 
 ###########################################################
 ### SQUID ###
@@ -18,15 +18,15 @@
 # заполнение файлов
  while read name server passwd ip iface proxy nat pptp channel temp; do
 	if [[ "$proxy" != "1" ]]; then
- 	    continue
- 	fi
- 	if [[ "$channel" == "$ppp1" ]]; then
- 		echo $ip >> "$squid_first_channel_src"
+	    continue
+	fi
+	if [[ "$channel" == "$ppp1" ]]; then
+		echo $ip >> "$squid_first_channel_src"
 	else if [[ "$channel" == "$ppp2" ]]; then
- 		echo $ip >> "$squid_second_channel_src"
- 	else if [[ "$channel" == "$ppp3" ]]; then
- 		echo $ip >> "$squid_third_channel_src"
- 	fi fi fi
+		echo $ip >> "$squid_second_channel_src"
+	else if [[ "$channel" == "$ppp3" ]]; then
+		echo $ip >> "$squid_third_channel_src"
+	fi fi fi
  done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 # перезапуск squid для применения настроек
@@ -48,12 +48,12 @@
  prio=20000
  while read name server passwd ip iface proxy nat pptp channel temp; do
 	if [[ "$nat" != "1" ]]; then
- 	    continue
- 	fi
-    if [[ "$channel" == "$ppp1" || "$channel" == "$ppp2" || "$channel" == "$ppp3" ]]; then
-        ip rule add from "$ip" table "$channel" prio "$prio"
+		continue
+	fi
+	if [[ "$channel" == "$ppp1" || "$channel" == "$ppp2" || "$channel" == "$ppp3" ]]; then
+		ip rule add from "$ip" table "$channel" prio "$prio"
 		let "prio = prio + 1"
-    fi	
+	fi
  done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 ###########################################################
