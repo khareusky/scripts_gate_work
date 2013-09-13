@@ -10,7 +10,7 @@ source /etc/gate/global.sh
  done < <(cat /etc/gate/data/list_accept_dst_ip.txt | grep -v "^#" | grep "[^[:space:]]")
 
 #########################################################################
-# вывод в консоль
+# вывод на консоль
 if [[ -z "$1" ]]; then
     iptables-save -t filter | grep FORWARD_ACCEPT
 fi

@@ -74,8 +74,8 @@
 
 #####################################
 # Распределение по каналам
- /etc/gate/channel_src.sh
- /etc/gate/channel_dst.sh
+ /etc/gate/channel_src.sh script
+ /etc/gate/channel_dst.sh script
 
 #####################################
 # ACCEPT DST IP
