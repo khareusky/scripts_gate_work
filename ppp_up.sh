@@ -12,20 +12,11 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 	#/etc/gate/channel/dst.sh auto
 
 	### ROUTE ###
-	/etc/gate/route/route_pppoe_up.sh
+	/etc/gate/route_ppp_up.sh
 
 	### SNAT: Добавление: для подмены исходного ip адреса пакетов на ip адрес сетевого интерфейса при пробросе из ЛВС в сеть Интернет ###
 	iptables -t nat -A POSTROUTING ! -s "$PPP_LOCAL" -o "$PPP_IFACE" -j SNAT --to-source "$PPP_LOCAL"
 
-	### DNAT ###
-	while read dport1 ip_dst dport2 temp ; do
-		### DNAT: Добавление: для подмены ip адреса назначения пакетов на ip адрес требуемого компьютера при пробросе из сети Интернет в ЛВС ###
-		iptables -t nat -A PREROUTING -i "$PPP_IFACE" -p tcp -m tcp --dport "$dport1" -j DNAT --to-destination "$ip_dst":"$dport2"
-		
-		### DNAT: Добавление: маркировка пакетов по каналам, чтобы ответные пакеты на запросы в ЛВС уходили в теже каналы ###
-		iptables -t mangle -A PREROUTING -i "$PPP_IFACE" -p tcp --dport "$dport1" -m state --state NEW -j CONNMARK --set-mark 0x`echo -n "$PPP_IFACE" | tail -c 1`
-	done < <(cat /etc/gate/data/list_dnat.txt | grep -v "^#" | grep "[^[:space:]]")
-	
 	### RATE ###
 	/etc/gate/rate/pppoe.sh
 

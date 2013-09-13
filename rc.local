@@ -4,6 +4,11 @@
  /etc/gate/sysctl.sh # для подключения необходимых модулей, для настройки системы, для увеличения быстродействия сети
  
 #####################################
+# заполнение пользовательской таблицы маршрутизации "static"
+ ip rule add table static prio 10
+ ip route add 10.0.0.0/24 dev "$int" src 10.0.0.1 table static
+ 
+#####################################
 # ЛВС
  ip rule add to 10.0.0.0/24 table main prio 20
  
@@ -49,11 +54,6 @@
  /etc/gate/firewall.sh # циклы по записи хостов в пользовательские цепочки
  /etc/gate/channel/src.sh # распределение по каналам компьютеров ЛВС
  
-#####################################
-# заполнение пользовательской таблицы маршрутизации "static"
- ip rule add table static prio 10
- ip route add 10.0.0.0/24 dev "$int" src 10.0.0.1 table static
- 
 ##################################### 
 # протоколирование
  iptables -t mangle -N FORWARD_LOG # цепочка для протоколирования хостов
@@ -98,9 +98,11 @@
  ip route add 10.3.0.0/24 dev "$int" src 10.3.0.254 table static
 
 ##################################### 
-# правила, чтобы пакеты уходили в те каналы, откуда пришли
+# DNAT 
+ iptables -t nat -N PREROUTING_DNAT # пользовательская цепочка для днатирования пакетов из сети Интернет в ЛВС
+ iptables -t mangle -N PREROUTING_DNAT # пользовательская цепочка для днатированых пакетов, чтобы пакеты уходили в теже каналы
  iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет в ЛВС) перенаправлялись на теже Интернет-каналы
- ip rule add fwmark 0x1/0x1 table "$ppp1" prio 7`echo -n "$ppp1" | tail -c 1`
+ ip rule add fwmark 0x1/0x1 table "$ppp1" prio 7`echo -n "$ppp1" | tail -c 1` # правила для того чтобы пакеты уходили в нужные каналы
  ip rule add fwmark 0x2/0x2 table "$ppp2" prio 7`echo -n "$ppp2" | tail -c 1`
  ip rule add fwmark 0x3/0x3 table "$ppp3" prio 7`echo -n "$ppp3" | tail -c 1`
 

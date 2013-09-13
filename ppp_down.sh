@@ -10,18 +10,9 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 
 	### SNAT: Удаление: для подмены исходного ip адреса пакетов на ip адрес сетевого интерфейса для проброса из ЛВС в сеть Интернет ###
 	iptables -t nat -D POSTROUTING ! -s "$PPP_LOCAL" -o "$PPP_IFACE" -j SNAT --to-source "$PPP_LOCAL"
-
-	### DNAT ###
-	while read dport1 ip_dst dport2 temp ; do
-		### DNAT: Удаление: для подмены ip адреса назначения пакетов на ip адрес требуемого компьютера для проброса из сети Интернет в ЛВС ###
-		iptables -t nat -D PREROUTING -i "$PPP_IFACE" -p tcp -m tcp --dport "$dport1" -j DNAT --to-destination "$ip_dst":"$dport2" 
-		
-		### DNAT: Удаление: маркировка пакетов по каналам, чтобы ответные пакеты на запросы в ЛВС уходили в теже каналы ###
-		iptables -t mangle -D PREROUTING -i "$PPP_IFACE" -p tcp --dport "$dport1" -m state --state NEW -j CONNMARK --set-mark 0x`echo -n "$PPP_IFACE" | tail -c 1`
-	done < <(cat /etc/gate/data/list_dnat.txt | grep -v "^#" | grep "[^[:space:]]")
 	
 	### ROUTE ###
-	/etc/gate/route/route_pppoe_down.sh
+	/etc/gate/route_ppp_down.sh
 	
 	### Сбросить кеш таблиц маршрутизации отключившегося канала
 	conntrack -D -q $PPP_LOCAL
