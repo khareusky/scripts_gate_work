@@ -66,9 +66,9 @@
  iptables -t mangle -A PREROUTING -j PREROUTING_DNAT
  iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет в ЛВС) перенаправлялись на теже Интернет-каналы
 
- ip rule add fwmark 0x1/0x1 table "$ppp1" prio 7`echo -n "$ppp1" | tail -c 1` # правила для того чтобы пакеты уходили в нужные каналы
- ip rule add fwmark 0x2/0x2 table "$ppp2" prio 7`echo -n "$ppp2" | tail -c 1`
- ip rule add fwmark 0x3/0x3 table "$ppp3" prio 7`echo -n "$ppp3" | tail -c 1`
+ ip rule add fwmark 0x1/0x1 table "$ppp1" prio 71 # правила для того чтобы пакеты уходили в нужные каналы
+ ip rule add fwmark 0x2/0x2 table "$ppp2" prio 72
+ ip rule add fwmark 0x3/0x3 table "$ppp3" prio 73
 
  /etc/gate/dnat.sh # заполнение цепочек данными
 
@@ -121,12 +121,12 @@
 
 #####################################
 # распределение по каналам для SQUID
- ip rule add from 10.1.0.254 table "$ppp1" prio 6`echo -n "$ppp1" | tail -c 1`
- ip rule add from 10.2.0.254 table "$ppp2" prio 6`echo -n "$ppp2" | tail -c 1`
- ip rule add from 10.3.0.254 table "$ppp3" prio 6`echo -n "$ppp3" | tail -c 1`
- ip route add 10.1.0.0/24 dev "$int" src 10.1.0.254 table static
- ip route add 10.2.0.0/24 dev "$int" src 10.2.0.254 table static
- ip route add 10.3.0.0/24 dev "$int" src 10.3.0.254 table static
+ ip rule add from 10.1.0.254 table "$ppp1" prio 61
+ ip rule add from 10.2.0.254 table "$ppp2" prio 62
+ ip rule add from 10.3.0.254 table "$ppp3" prio 63
+ ip rule add to 10.1.0.254 table main prio 64
+ ip rule add to 10.2.0.254 table main prio 65
+ ip rule add to 10.3.0.254 table main prio 66
 
 #####################################
  /etc/gate/rate/int.sh # ограничение по скорости

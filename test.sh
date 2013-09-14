@@ -1,4 +1,6 @@
 
 source /etc/gate/global.sh
 
-echo "$ppp1"
+echo "1
+2
+3"

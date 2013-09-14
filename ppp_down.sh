@@ -16,10 +16,20 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 	
 	### Сбросить кеш таблиц маршрутизации отключившегося канала
 	conntrack -D -q "$PPP_LOCAL"
-	
-	### DNS ###
-	if [ "$PPP_IFACE" == "$ppp2" ] ; then
-		cp -f /etc/bind/named.conf.options_byfly /etc/bind/named.conf.options
+
+	### Перезапуск DNS ###
+	# удаление старых правил по перенаправлению dns серверов отключившегося провайдера через его канал
+	ip rule del prio 1"`echo -n $PPP_IFACE | tail -c 1`"0
+	ip rule del prio 1"`echo -n $PPP_IFACE | tail -c 1`"1
+
+	# замена конф файла и перезапуск локального dns сервера
+	if [[ "$PPP_IFACE" == "$ppp2" ]] ; then
+		if [[ "`ip addr show $ppp1 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" != "" ]] ; then
+			cp -f /etc/bind/named.conf.options_"$ppp1" /etc/bind/named.conf.options
+		else if [[ "`ip addr show $ppp3 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" != "" ]] ; then
+			cp -f /etc/bind/named.conf.options_"$ppp3" /etc/bind/named.conf.options
+		fi
+		chown bind:bind /etc/bind/named.conf.options
 		/etc/init.d/bind9 restart
 	fi
 else

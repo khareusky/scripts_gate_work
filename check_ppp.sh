@@ -58,7 +58,7 @@ do
         kill_ppp "$iface"
         log "pon $iface"
         pon "$iface" >/dev/null
-        sleep 4
+        sleep 8
     fi
 done
 

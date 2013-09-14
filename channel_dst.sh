@@ -30,9 +30,9 @@ filename="/etc/gate/data/channel_dst.txt"
  output "reload squid"
  a=$(cat /var/run/squid3.pid 2>/dev/null)
  if [ "$a" == "" ]; then
- 	/etc/init.d/squid3 start
+ 	/etc/init.d/squid3 start >/dev/null
  else
- 	/etc/init.d/squid3 reload
+ 	/etc/init.d/squid3 reload >/dev/null
  fi
 
 ###########################################################
@@ -56,3 +56,5 @@ filename="/etc/gate/data/channel_dst.txt"
 ###########################################################
 output "new rules:"
 output "`ip rule ls | grep -e '^1[0-9][0-9][0-9][0-9]:'`"
+
+###########################################################
