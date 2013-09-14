@@ -1,21 +1,13 @@
 #!/bin/bash
 ###########################################################
-# Распределение по каналам исходя из ip адресов назначения
+# распределение по каналам исходя из ip адресов назначения
 ###########################################################
 source /etc/gate/global.sh
 filename="/etc/gate/data/channel_dst.txt"
-out="$1"
-
-#########################################################################
-# вывод на консоль
-output() {
-    if [[ -z "$out" ]]; then
-	echo "$1";
-    fi
-}
 
 ###########################################################
 ### SQUID ###
+ output "rewrite squid config files"
  rm -f "$squid_first_channel_dst"
  rm -f "$squid_second_channel_dst"
  rm -f "$squid_third_channel_dst"
@@ -34,7 +26,8 @@ output() {
 	fi fi fi
  done < <(cat "$filename" | grep -v "^#" | grep "[^[:space:]]")
 
-# перезапуск squid для применения настроек
+# перезапуск squid для применения новых настроек
+ output "reload squid"
  a=$(cat /var/run/squid3.pid 2>/dev/null)
  if [ "$a" == "" ]; then
  	/etc/init.d/squid3 start
@@ -44,11 +37,14 @@ output() {
 
 ###########################################################
 ### NAT ###
-# Удаление вставленных нами правил
+# удаление всех старых правил
+ output "clear old rules"
  while read line; do
     ip rule del prio "$line"
  done < <( ip rule show | grep -e '^1[0-9][0-9][0-9][0-9]:' | cut -d ':' -f1)
 
+# заполнение новыми правилами
+ output "add new rules"
  prio=10000
  while read ip channel temp; do
 	if [[ "$channel" == "$ppp1" || "$channel" == "$ppp2" || "$channel" == "$ppp3" ]]; then
@@ -58,4 +54,5 @@ output() {
  done < <(cat "$filename" | grep -v "^#" | grep "[^[:space:]]")
 
 ###########################################################
+output "new rules:"
 output "`ip rule ls | grep -e '^1[0-9][0-9][0-9][0-9]:'`"

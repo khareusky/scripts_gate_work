@@ -1,12 +1,13 @@
 #!/bin/bash
 ###########################################################
-# Распределение хостов по каналам
+# распределение хостов по каналам из ip адресов ЛВС
 ###########################################################
 source /etc/gate/global.sh
 
 ###########################################################
 ### SQUID ###
 #перезапись файлов ip адресов, разбитых по каналам
+ output "rewrite squid config files"
  rm -f "$squid_first_channel_src"
  rm -f "$squid_second_channel_src"
  rm -f "$squid_third_channel_src"
@@ -30,6 +31,7 @@ source /etc/gate/global.sh
  done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 # перезапуск squid для применения настроек
+ output "reload squid"
  a=$(cat /var/run/squid3.pid 2>/dev/null)
  if [ "$a" == "" ]; then
  	/etc/init.d/squid3 start
@@ -40,11 +42,13 @@ source /etc/gate/global.sh
 ###########################################################
 ### SNAT ###
 # очистка правил для NAT
+ output "clear old rules"
  while read line; do
     ip rule del prio "$line"
  done < <( ip rule show | grep -e '^2[0-9][0-9][0-9][0-9]:' | cut -d ':' -f1)
 
 # заполнения правил для тех, у кого NAT
+ output "add new rules"
  prio=20000
  while read name server passwd ip iface proxy nat pptp channel temp; do
 	if [[ "$nat" != "1" ]]; then
@@ -57,3 +61,5 @@ source /etc/gate/global.sh
  done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 ###########################################################
+ output "new rules:"
+ output "`ip rule ls | grep -e '^2[0-9][0-9][0-9][0-9]:'`"
