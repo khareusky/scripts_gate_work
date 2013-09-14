@@ -10,7 +10,10 @@
 
 ########################################################################
 ### Если идет обращение непосредственно к шлюзу, то ответные пакеты по тому же каналу ###
- ip rule add from "$PPP_LOCAL" table "$PPP_IFACE" prio `echo -n "$PPP_IFACE" | tail -c 3`
+ while read temp; do
+    ip rule del prio "`echo -n $PPP_IFACE | tail -c 3`"
+ done < <(ip rule ls | grep ^"`echo -n $PPP_IFACE | tail -c 3`:")
+ ip rule add from "$PPP_LOCAL" table "$PPP_IFACE" prio "`echo -n $PPP_IFACE | tail -c 3`"
 
 ########################################################################
 ### TABLE "static" ###
