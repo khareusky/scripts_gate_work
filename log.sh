@@ -2,6 +2,7 @@
 #################################################################
 # Заполнение пользовательской цепочки FORWARD_LOG хостами ЛВС для протоколирования
 #################################################################
+source /etc/gate/global.sh # подключение файла с переменными
 
  iptables -t mangle -F FORWARD_LOG # очистка цепочки
  while read name server passwd ip iface proxy nat pptp channel rate1 rate2 log temp; do

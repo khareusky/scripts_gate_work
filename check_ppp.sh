@@ -3,49 +3,45 @@
 # Скрипт для запуска и проверки функционирования PPPoE каналов
 #########################################################################
 source /etc/gate/global.sh
+iface="$1"
 
-log() {
-    echo "`date +%D\ %T` $0: $@" >> "$log_file";
-}
-
+#########################################################################
 kill_ppp() {
     if [[ `ps -eao pid,cmd | grep -v grep | grep -c "/usr/sbin/pppd call $iface"` != "0" ]]; then
-        log "poff $iface"
         poff "$iface" >/dev/null
-        sleep 1;
+        sleep 3;
     fi
 
     if [[ `ps -eao pid,cmd | grep -v grep | grep -c "/usr/sbin/pppd call $iface"` != "0" ]]; then
-        log "weak stop $iface"
         ps -eao pid,cmd | grep "/usr/sbin/pppd call $iface" | grep -v grep | while read i
         do
             i=`echo $i | awk '{printf $1}'`
             kill "$i"
         done
-        sleep 1
+        sleep 2;
     fi
 
     if [[ `ps -eao pid,cmd | grep -v grep | grep -c "/usr/sbin/pppd call $iface"` != "0" ]]; then
-        log "force stop $iface"
         ps -eao pid,cmd | grep "/usr/sbin/pppd call $iface" | grep -v grep | while read i
         do
             i=`echo $i | awk '{printf $1}'`
             kill -9 "$i"
         done
-        sleep 1
+        sleep 1;
     fi
 }
 
-iface="$1"
-
-# проверка на запущенность #
+#########################################################################
+# проверка на запущенность
 if [[ `ps uax | grep -v grep | grep -c "/bin/bash /etc/gate/check_ppp.sh $iface" 2>/dev/null` != "2" ]]; then
-    log "checking of the $iface is doubled, exit"
-    exit 0
+    log "script is doubled, exit this one";
+    exit 0;
 fi
 
-while [ true ];
-do
+#########################################################################
+# периодический пинг и проверка подключения
+log "start check $iface";
+while [ true ]; do
     if [[ `ip addr show "$iface" 2>/dev/null` ]]; then
         log "START ping $iface";
         ip="`ip addr show $iface | grep inet -m 1| awk '{print $4}'| cut -d '/' -f1`"
@@ -56,10 +52,10 @@ do
         kill_ppp "$iface"
     else
         kill_ppp "$iface"
-        log "pon $iface"
         pon "$iface" >/dev/null
-        sleep 8
+        sleep 10;
     fi
 done
 
+#########################################################################
 exit 0;

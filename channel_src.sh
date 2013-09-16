@@ -5,8 +5,9 @@
 source /etc/gate/global.sh
 
 ###########################################################
-### SQUID ###
-#перезапись файлов ip адресов, разбитых по каналам
+### SQUID SRC ###
+# перезапись файлов ip адресов, разбитых по каналам
+ output "###########################################################"
  output "rewrite squid config files"
  rm -f "$squid_first_channel_src"
  rm -f "$squid_second_channel_src"
@@ -34,9 +35,9 @@ source /etc/gate/global.sh
  output "reload squid"
  a=$(cat /var/run/squid3.pid 2>/dev/null)
  if [ "$a" == "" ]; then
- 	/etc/init.d/squid3 start
+ 	/etc/init.d/squid3 restart >/dev/null
  else
- 	/etc/init.d/squid3 reload
+ 	/etc/init.d/squid3 reload >/dev/null
  fi
 
 ###########################################################
@@ -61,5 +62,9 @@ source /etc/gate/global.sh
  done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 ###########################################################
- output "new rules:"
- output "`ip rule ls | grep -e '^2[0-9][0-9][0-9][0-9]:'`"
+output "###########################################################"
+output "new rules:
+`ip rule ls | grep -e '^2[0-9][0-9][0-9][0-9]:'`"
+ output "###########################################################"
+
+###########################################################

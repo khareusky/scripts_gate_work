@@ -135,7 +135,7 @@ ip route add default via 10.0.0.97 table temp97
  ip rule add to 10.3.0.254 table main prio 66
  ip rule add to 10.4.0.254 table main prio 68
 
- iptables -t nat -A POSTROUTING -o "$int" -s 10.4.0.254 -j SNAT --to-source 10.0.0.1
+ iptables -t nat -A POSTROUTING -o "$int" -s 10.4.0.254 -j SNAT --to-source 10.0.0.129
 
 #####################################
  /etc/gate/rate/int.sh # ограничение по скорости

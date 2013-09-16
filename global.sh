@@ -8,10 +8,9 @@ wifi="eth2"
 ppp1="ppp101"
 ppp2="ppp102"
 ppp3="ppp103"
-
 ssh_port="1786"
-#########################################################################
-path1="/etc/gate/"
+path="/etc/gate/"
+script_name="`basename $0`"
 log_file="/var/log/gate.log"
 
 #########################################################################
@@ -27,8 +26,13 @@ squid_third_channel_dst="/etc/gate/data/squid3_third_channel_dst.txt"
 out="$1"
 output() {
     if [[ -z "$out" ]]; then
-		echo "$1";
+        echo "$script_name: $1";
     fi
+}
+#########################################################################
+# вывод в файл
+log() {
+    echo "`date +%D\ %T` $script_name: $1" >> "$log_file";
 }
 
 #########################################################################
