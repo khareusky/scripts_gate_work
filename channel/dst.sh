@@ -65,44 +65,11 @@ fi
 
 ###########################################################
 ### SQUID DST ###
- rm -f /etc/squid3/first_channel_dst.txt
- rm -f /etc/squid3/second_channel_dst.txt
- rm -f /etc/squid3/third_channel_dst.txt
+ rm -f "/etc/gate/data/squid3_forth_channel_dst.txt"
+ touch "/etc/gate/data/squid3_forth_channel_dst.txt"
 
- touch /etc/squid3/first_channel_dst.txt
- touch /etc/squid3/second_channel_dst.txt
- touch /etc/squid3/third_channel_dst.txt
-
- while read ip channel access name
- do
- 	if [ "$channel" == "0" ]; then
- 	    continue
- 	fi
-
- 	if [ "$channel" == "1" ]; then
- 		if [ "$name" == "1" ]; then
- 		    host "$ip" | grep has | awk '{print $4}' >> /etc/squid3/first_channel_dst.txt
- 		else
- 		    echo $ip >> /etc/squid3/first_channel_dst.txt
- 		fi
- 		continue
- 	fi
- 	if [ "$channel" == "2" ]; then
- 		if [ "$name" == "1" ]; then
- 		    host "$ip" | grep has | awk '{print $4}' >> /etc/squid3/second_channel_dst.txt
- 		else
- 		    echo $ip >> /etc/squid3/second_channel_dst.txt
- 		fi
- 		continue
- 	fi
- 	if [ "$channel" == "3" ]; then
- 		if [ "$name" == "1" ]; then
- 		    host "$ip" | grep has | awk '{print $4}' >> /etc/squid3/third_channel_dst.txt
- 		else
- 		    echo $ip >> /etc/squid3/third_channel_dst.txt
- 		fi
- 		continue
- 	fi
+ while read site channel temp; do
+    echo $ip >> "/etc/gate/data/squid3_forth_channel_dst.txt"
  done < <(cat /etc/gate/data/list_of_dst.txt | grep -v "^#" | grep "[^[:space:]]")
 
  a=$(cat /var/run/squid3.pid 2>/dev/null)

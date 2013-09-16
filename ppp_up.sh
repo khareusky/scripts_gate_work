@@ -32,15 +32,18 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 # $PPP_IFACE
 options {
 	directory \"/var/cache/bind\";
-	forwarders {
-		$DNS1;
+	forwarders {" > /etc/bind/named.conf.options_"$PPP_IFACE"
+#	if [[ "$PPP_IFACE" != "$ppp2" ]]; then
+#		echo "		10.0.0.97;" >> /etc/bind/named.conf.options_"$PPP_IFACE";
+#	fi
+echo "		$DNS1;
 		$DNS2;
 	};
 	forward only;
 	auth-nxdomain no;
 	listen-on { 10.0.0.254; 10.0.2.254; 10.0.3.254; 127.0.0.1; };
 	listen-on-v6 { none; };
-};" > /etc/bind/named.conf.options_"$PPP_IFACE"
+};" >> /etc/bind/named.conf.options_"$PPP_IFACE"
 
 	# замена конф файла и перезапуск локального dns сервера
 	if [[ "$PPP_IFACE" == "$ppp2" || "`ip addr show $ppp2 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" == "" ]]; then
@@ -50,10 +53,31 @@ options {
 	fi
 	
 	### Перенаправление сайтов на заданые каналы ###
-	while read site channel; do
-		echo 1;
-	done < <(cat /etc/gate/data/channel_dst_sites.txt | grep -v "^#" | grep "[^[:space:]]")
+	prio=900
+	while read line; do
+	    ip rule del prio "$line"
+	done < <( ip rule show | grep -e '^9[0-9][0-9]:' | cut -d ':' -f1)
 
+	while read site channel; do
+		while read line; do
+ 			ip rule add to "$line" table temp97 prio "$prio"
+ 			let "prio = prio + 1"
+ 		done < <(host "$site" | grep has | awk '{print $4}')
+	done < <(cat /etc/gate/data/channel_dst_sites.txt | grep -v "^#" | grep "[^[:space:]]")
+	
+	 rm -f "/etc/gate/data/squid3_forth_channel_dst.txt"
+	 touch "/etc/gate/data/squid3_forth_channel_dst.txt"
+
+	 while read site channel temp; do
+	    host "$site" | grep has | awk '{print $4}' >> "/etc/gate/data/squid3_forth_channel_dst.txt"
+	 done < <(cat /etc/gate/data/channel_dst_sites.txt | grep -v "^#" | grep "[^[:space:]]")
+
+	 a=$(cat /var/run/squid3.pid 2>/dev/null)
+	 if [ "$a" == "" ]; then
+	 	/etc/init.d/squid3 start
+	 else
+	 	/etc/init.d/squid3 reload
+	 fi
 else
 	### LOG ###
 	echo "`date +%D\ %T` $0: CONNECT PPTP ($PPP_IFACE | $PPP_REMOTE | $PPP_IPPARAM | $PEERNAME)" >> "$log_file"
