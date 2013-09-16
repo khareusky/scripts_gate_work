@@ -51,7 +51,7 @@ options {
 	
 	### Перенаправление сайтов на заданые каналы ###
 	while read site channel; do
-		
+		echo 1;
 	done < <(cat /etc/gate/data/channel_dst_sites.txt | grep -v "^#" | grep "[^[:space:]]")
 
 else
