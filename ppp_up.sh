@@ -91,7 +91,7 @@ else
 	cp "/var/run/$PPP_IFACE.pid" "/var/run/pptpd-users/$PEERNAME"
 
 	### ROUTE ###
-	ip route add $PPP_REMOTE dev $PPP_IFACE proto kernel scope link  src $PPP_LOCAL table static
+	#ip route add $PPP_REMOTE dev $PPP_IFACE proto kernel scope link  src $PPP_LOCAL table static
 
 	### RATE ###
 	/etc/gate/rate/pptp.sh
