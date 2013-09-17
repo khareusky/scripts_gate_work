@@ -4,11 +4,6 @@
  /etc/gate/sysctl.sh # для подключения необходимых модулей, для настройки системы, для увеличения быстродействия сети
 
 #####################################
-# заполнение пользовательской таблицы маршрутизации "static"
-# ip rule add table static prio 10
-# ip route add 10.0.0.0/24 dev "$int" src 10.0.0.1 table static
-
-#####################################
 # ЛВС
 # создание пользовательских цепочек
  iptables -N INPUT_PROXY
@@ -93,25 +88,6 @@ ip route add default via 10.0.0.97 table temp97
  /etc/gate/log.sh # заполнение цепочки FORWARD_LOG хостами
 
 #####################################
-# WIFI
- /etc/gate/wifi.sh
-
-#####################################
-# правила для модемов
- ip rule add to 10.0.1.1 table main prio 51
- ip rule add to 10.0.2.1 table main prio 52
- ip rule add to 10.0.3.1 table main prio 53
- ip rule add from 10.0.1.1 table main prio 54
- ip rule add from 10.0.2.1 table main prio 55
- ip rule add from 10.0.3.1 table main prio 56
- iptables -A FORWARD -o "$ext1" -d 10.0.1.1 -j ACCEPT
- iptables -A FORWARD -o "$ext2" -d 10.0.2.1 -j ACCEPT
- iptables -A FORWARD -o "$ext3" -d 10.0.3.1 -j ACCEPT
- iptables -t nat -A POSTROUTING -o "$ext1" -d 10.0.1.1 -j SNAT --to-source "`ip addr show $ext1 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`"
- iptables -t nat -A POSTROUTING -o "$ext2" -d 10.0.2.1 -j SNAT --to-source "`ip addr show $ext2 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`"
- iptables -t nat -A POSTROUTING -o "$ext3" -d 10.0.3.1 -j SNAT --to-source "`ip addr show $ext3 | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`"
-
-#####################################
 # распределение по каналам для SQUID
  ip rule add from 10.1.0.254 table "$ppp1" prio 61
  ip rule add from 10.2.0.254 table "$ppp2" prio 62
@@ -127,8 +103,10 @@ ip route add default via 10.0.0.97 table temp97
  iptables -t nat -A POSTROUTING -d 10.0.0.79 -o "$int" -j SNAT --to-source 10.0.0.129
 
 #####################################
- /etc/gate/rate/int.sh # ограничение по скорости
- /etc/gate/ssh_connect.sh& # поднимаем ssh подключение, через которое будем получать доступ к данному шлюзу
+ "$path"/modems.sh # модемы
+ "$path"/wifi.sh # wifi
+ "$path"/rate/int.sh # ограничение по скорости
+ "$path"/ssh_connect.sh& # поднимаем ssh подключение, через которое будем получать доступ к данному шлюзу
 
 #####################################
 # скрипты для поддержания подключений в активном состоянии с помощью пинга
