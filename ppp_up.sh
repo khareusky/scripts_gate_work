@@ -29,7 +29,7 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 
 	# сохранение данных dns серверов провайдера
 	echo "# Данный файл изменяется скриптом /etc/gate/ppp_up.sh при подключении к каналам
-# $PPP_IFACE
+# `date +%D\ %T` $PPP_IFACE
 options {
 	directory \"/var/cache/bind\";
 	forwarders {" > /etc/bind/named.conf.options_"$PPP_IFACE"

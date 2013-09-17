@@ -5,13 +5,11 @@
 
 #####################################
 # заполнение пользовательской таблицы маршрутизации "static"
- ip rule add table static prio 10
- ip route add 10.0.0.0/24 dev "$int" src 10.0.0.1 table static
+# ip rule add table static prio 10
+# ip route add 10.0.0.0/24 dev "$int" src 10.0.0.1 table static
 
 #####################################
 # ЛВС
- ip rule add to 10.0.0.0/24 table main prio 20
-
 # создание пользовательских цепочек
  iptables -N INPUT_PROXY
  iptables -N INPUT_PPTP
@@ -38,14 +36,16 @@
 ### FILTER FORWARD ###
  iptables -P FORWARD DROP # состояние по-умолчанию, когда ни одно из правил не сработало
  iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT # пропускать те пакеты, которые уже подключились
-
  iptables -A FORWARD -j FORWARD_DROP # список запрещенных ip адресов
 
 ### FILTER OUTPUT ###
  iptables -P OUTPUT ACCEPT # состояние по-умолчанию, когда ни одно из правил не сработало
  iptables -A OUTPUT -j FORWARD_DROP
 
+ ip rule add to 10.0.0.0/24 table main prio 20
  /etc/gate/firewall.sh # циклы по записи хостов в пользовательские цепочки
+ /etc/gate/channel_src.sh script # распределение по каналам
+ /etc/gate/channel_dst.sh script
 
 #####################################
 # SNAT
@@ -73,11 +73,6 @@
  /etc/gate/dnat.sh # заполнение цепочек данными
 
 #####################################
-# Распределение по каналам
- /etc/gate/channel_src.sh script
- /etc/gate/channel_dst.sh script
-
-#####################################
 # Перенаправление запрещенных сайтов на 10.0.0.97
 ip route add default via 10.0.0.97 table temp97
 
@@ -89,7 +84,7 @@ ip route add default via 10.0.0.97 table temp97
  /etc/gate/accept_dst_ip.sh script # заполнение цепочки данными
 
 #####################################
-# Протоколирование
+# LOGS
  iptables -t mangle -N FORWARD_LOG # цепочка для протоколирования хостов
  iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu # принудительная корректировка MSS в пакетах всего транзитного траффика
  iptables -t mangle -A FORWARD -i "$int" -s 10.0.0.0/24 -m state --state NEW -j FORWARD_LOG # протоколирование компьютеров ЛВС у кого NAT
@@ -98,15 +93,8 @@ ip route add default via 10.0.0.97 table temp97
  /etc/gate/log.sh # заполнение цепочки FORWARD_LOG хостами
 
 #####################################
-# правила для wifi
- iptables -A INPUT -i "$wifi" -s 10.0.3.0/24 -p udp --dport 53 -j ACCEPT # dns for WIFI
- iptables -A INPUT -i "$wifi" -s 10.0.3.0/24 -p udp --dport 67 -j ACCEPT # dhcp for WIFI
- iptables -A INPUT -i "$wifi" -s 10.0.3.0/24 -p icmp -j ACCEPT # icmp
- iptables -A FORWARD -i "$wifi" -s 10.0.3.0/24 -j ACCEPT # открытие доступа для wifi
- iptables -t nat -A POSTROUTING -o "$int" -s 10.0.3.0/24 -d 10.0.0.0/24 -j SNAT --to-source "`ip addr show $int | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`" # SNAT wifi в ЛВС
-
- ip rule add from 10.0.3.0/24 to 10.0.0.0/24 table main prio 40
- ip rule add from 10.0.3.0/24 table "$ppp2" prio 41 # перенаправляем wifi на второй канал Интернета
+# WIFI
+ /etc/gate/wifi.sh
 
 #####################################
 # правила для модемов
@@ -136,6 +124,7 @@ ip route add default via 10.0.0.97 table temp97
  ip rule add to 10.4.0.254 table main prio 68
 
  iptables -t nat -A POSTROUTING -o "$int" -s 10.4.0.254 -j SNAT --to-source 10.0.0.129
+ iptables -t nat -A POSTROUTING -d 10.0.0.79 -o "$int" -j SNAT --to-source 10.0.0.129
 
 #####################################
  /etc/gate/rate/int.sh # ограничение по скорости
