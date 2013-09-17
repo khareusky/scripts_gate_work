@@ -13,12 +13,9 @@ done < <( ip rule show | grep -e '^4[0-9]:' | cut -d ':' -f1)
 
 #####################################
 # заполнение данными
-ip rule add from "$wifi_lan" to "$wifi_addr" table main prio 40 # from wifi to gate
-ip rule add from "$wifi_addr" to "$wifi_lan" table main prio 41 # from gate to wifi
-ip rule add from "$wifi_lan" to "$int_lan" table main prio 42 # from wifi to LAN
-ip rule add from "$int_lan" to "$wifi_lan" table main prio 43 # from LAN to wifi
-ip rule add from "$wifi_lan" to all table "$ppp2" prio 44 # from wifi to internet
-ip rule add from all to "$wifi_lan" table main prio 45 # from internet to wifi
+ip rule add from "$wifi_lan" table main prio 40 # from wifi to LAN
+ip rule add from "$wifi_lan" table "$ppp2" prio 41 # from wifi to internet
+ip rule add to "$wifi_lan" table main prio 42 # from all to wifi
 
 iptables -A INPUT -i "$wifi" -s "$wifi_lan" -p udp --dport 53 -j ACCEPT # allow dns for wifi
 iptables -A INPUT -i "$wifi" -s "$wifi_lan" -p udp --dport 67 -j ACCEPT # allow dhcp for wifi
