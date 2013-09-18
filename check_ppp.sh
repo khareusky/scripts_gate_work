@@ -42,7 +42,8 @@ fi
 # периодический пинг и проверка подключения
 log "start check $iface";
 while [ true ]; do
-    if [[ `ip addr show "$iface" 2>/dev/null` ]]; then
+    ip addr show "$iface" 2>/dev/null;
+    if [[ "$?" == "0" ]]; then
         log "START ping $iface";
         ip="`ip addr show $iface | grep inet -m 1| awk '{print $4}'| cut -d '/' -f1`"
         while [ true ]; do
