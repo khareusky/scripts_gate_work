@@ -68,7 +68,7 @@ PPP_REMOTE2="`ip addr show $ppp2 2>/dev/null |grep inet -m 1| awk '{print $4}'| 
 PPP_LOCAL3="`ip addr show $ppp3 2>/dev/null |grep inet -m 1| awk '{print $2}'| cut -d '/' -f1`"
 PPP_REMOTE3="`ip addr show $ppp3 2>/dev/null |grep inet -m 1| awk '{print $4}'| cut -d '/' -f1`"
 
-# Перезапись балансировки между двумя или тремя каналами 
+# Перезапись балансировки между двумя или тремя каналами
 ip route flush table balance;
 ip route flush cache table balance;
 if [[ "$PPP_REMOTE1" != "" && "$PPP_REMOTE2" != "" && "$PPP_REMOTE3" != "" ]]; then

@@ -4,6 +4,9 @@ source /etc/gate/global.sh
 ext1_addr="`ip addr show $ext1 | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
 ext2_addr="`ip addr show $ext2 | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
 ext3_addr="`ip addr show $ext3 | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
+ip_modem1="10.0.1.1"
+ip_modem2="10.0.2.1"
+ip_modem3="10.0.3.1"
 
 #####################################
 # очистка правил
@@ -20,9 +23,9 @@ done < <( ip rule show | grep -e '^5[0-9]:' | cut -d ':' -f1)
 ip rule add from to "$ext1_addr" table main prio 11
 ip rule add to "$ext2_addr" table main prio 12
 ip rule add to "$ext3_addr" table main prio 13
-ip rule add from 10.0.1.1 table main prio 54
-ip rule add from 10.0.2.1 table main prio 55
-ip rule add from 10.0.3.1 table main prio 56
+ip rule add from 10.0.1.1 table main prio 14
+ip rule add from 10.0.2.1 table main prio 15
+ip rule add from 10.0.3.1 table main prio 16
 iptables -A FORWARD -o "$ext1" -d 10.0.1.1 -j ACCEPT
 iptables -A FORWARD -o "$ext2" -d 10.0.2.1 -j ACCEPT
 iptables -A FORWARD -o "$ext3" -d 10.0.3.1 -j ACCEPT

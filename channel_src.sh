@@ -55,10 +55,13 @@ source /etc/gate/global.sh
 	if [[ "$nat" != "1" ]]; then
 		continue
 	fi
-	if [[ "$channel" == "$ppp1" || "$channel" == "$ppp2" || "$channel" == "$ppp3" ]]; then
+	if [[ "$channel" == "*" ]]; then
+		ip rule add from "$ip" table balance prio "$prio"
+		let "prio = prio + 1"
+	else if [[ "$channel" == "$ppp1" || "$channel" == "$ppp2" || "$channel" == "$ppp3" ]]; then
 		ip rule add from "$ip" table "$channel" prio "$prio"
 		let "prio = prio + 1"
-	fi
+	fi fi
  done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 ###########################################################
