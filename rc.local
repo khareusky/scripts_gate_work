@@ -83,7 +83,6 @@ ip route add default via 10.0.0.97 table temp97
  iptables -t mangle -N FORWARD_LOG # цепочка для протоколирования хостов
  iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu # принудительная корректировка MSS в пакетах всего транзитного траффика
  iptables -t mangle -A FORWARD -i "$int" -s 10.0.0.0/24 -m state --state NEW -j FORWARD_LOG # протоколирование компьютеров ЛВС у кого NAT
- iptables -t mangle -A FORWARD -i "$wifi" ! -o "$int" -s 10.0.3.0/24 -m state --state NEW -j ULOG --ulog-cprange 40 # протоколирование WIFI
 
  /etc/gate/log.sh # заполнение цепочки FORWARD_LOG хостами
 
@@ -103,8 +102,22 @@ ip route add default via 10.0.0.97 table temp97
  iptables -t nat -A POSTROUTING -d 10.0.0.79 -o "$int" -j SNAT --to-source 10.0.0.129
 
 #####################################
+# wifi
+iptables -N INPUT_WIFI
+iptables -N FORWARD_WIFI
+iptables -t nat -N POSTROUTING_WIFI
+iptables -t mangle -N FORWARD_WIFI
+
+iptables -A INPUT -j INPUT_WIFI
+iptables -A FORWARD -j FORWARD_WIFI
+iptables -t nat -A POSTROUTING -j POSTROUTING_WIFI
+iptables -t mangle -A FORWARD -j FORWARD_WIFI
+
+"$path"/wifi.sh
+
+#####################################
  "$path"/modems.sh # модемы
- "$path"/wifi.sh # wifi
+
  "$path"/rate/int.sh # ограничение по скорости
  "$path"/ssh_connect.sh& # поднимаем ssh подключение, через которое будем получать доступ к данному шлюзу
 
