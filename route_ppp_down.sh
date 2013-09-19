@@ -25,7 +25,7 @@ else if [[ "$PPP_REMOTE2" != "" ]]; then
 else if [[ "$PPP_REMOTE3" != "" ]]; then
 	PPP_IFACE_CONNECTED="$ppp3"
 fi fi fi
- 
+
 # Если какой-то канал отключен, то заполнение пропуска подключившемся каналом 
 ip route del default dev "$PPP_IFACE" table "$ppp1"
 ip route del default dev "$PPP_IFACE" table "$ppp2"
@@ -61,5 +61,12 @@ else if [[ "$PPP_REMOTE1" == "" && "$PPP_REMOTE2" != "" && "$PPP_REMOTE3" != "" 
 else
 	route add default dev "$PPP_IFACE_CONNECTED" table balance; # когда остался один канал
 fi fi fi
+
+########################################################################
+### TABLE "main" ###
+if [[ -z "`ip route ls  | grep 'default dev $PPP_IFACE'`" ]]; then
+    ip route del default;
+    ip route add default dev "$PPP_IFACE_CONNECTED" table main;
+fi
 
 ########################################################################

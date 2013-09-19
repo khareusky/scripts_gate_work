@@ -90,3 +90,9 @@ fi fi fi fi
 console "ip route ls table balance: `ip route ls table balance`"
 
 ########################################################################
+### TABLE "main" ###
+if [[ -z "`ip route ls  | grep default`" ]]; then
+    ip route add default dev "$PPP_IFACE" table main;
+fi
+
+########################################################################
