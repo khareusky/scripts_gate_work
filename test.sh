@@ -1,5 +1,26 @@
 #!/bin/bash
 
+
+
+# удаление строк
+sed -i "/$ip_modem1/d" "$squid_first_channel_dst"
+sed -i "/$ip_modem2/d" "$squid_second_channel_dst"
+sed -i "/$ip_modem3/d" "$squid_third_channel_dst"
+
+exit 0;
+
+ps x | grep -v grep | grep $$ | grep "+" >/dev/null
+if [[ "$?" == "0" ]]; then
+    echo "fg" > /tmp/1
+else 
+    echo "bg" > /tmp/1
+fi
+ 
+#if [[ "$" ]]; then
+#fi
+
+exit 0;
+
 source /etc/gate/global.sh
 
 

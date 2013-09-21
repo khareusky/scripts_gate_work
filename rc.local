@@ -116,17 +116,26 @@ iptables -t mangle -A FORWARD -j FORWARD_WIFI
 "$path"/wifi.sh
 
 #####################################
+# modems
+iptables -N FORWARD_MODEM
+iptables -t nat -N POSTROUTING_MODEM
+
+iptables -A FORWARD -j FORWARD_MODEM
+iptables -t nat -A POSTROUTING -j POSTROUTING_MODEM
+
 "$path"/modems.sh # модемы
+
+#####################################
 "$path"/rate/int.sh # ограничение по скорости
 "$path"/ssh_connect.sh& # поднимаем ssh подключение, через которое будем получать доступ к данному шлюзу
 
 #####################################
 # скрипты для поддержания подключений в активном состоянии с помощью пинга
- /etc/gate/check_ppp.sh "$ppp1" 2>/dev/null&
+ /etc/gate/check_ppp.sh "$ppp1" >/dev/null 2>&1 &
  sleep 2
- /etc/gate/check_ppp.sh "$ppp2" 2>/dev/null&
+ /etc/gate/check_ppp.sh "$ppp2" >/dev/null 2>&1 &
  sleep 2
- /etc/gate/check_ppp.sh "$ppp3" 2>/dev/null&
+ /etc/gate/check_ppp.sh "$ppp3" >/dev/null 2>&1 &
  sleep 2
 
 #####################################

@@ -42,7 +42,6 @@
         fi
 
     ### DOWN ###
-	echo $ip $rate1 $rate2
         rate="$(($rate1+16))"
         tc class add dev $int parent 1:1 classid 1:$uid htb rate "$(($rate/4))"kbit ceil "$rate"kbit burst 4k
 

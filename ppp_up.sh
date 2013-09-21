@@ -33,9 +33,9 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 options {
 	directory \"/var/cache/bind\";
 	forwarders {" > /etc/bind/named.conf.options_"$PPP_IFACE"
-#	if [[ "$PPP_IFACE" != "$ppp2" ]]; then
-#		echo "		10.0.0.97;" >> /etc/bind/named.conf.options_"$PPP_IFACE";
-#	fi
+	if [[ "$PPP_IFACE" != "$ppp2" ]]; then
+		echo "		10.0.0.97;" >> /etc/bind/named.conf.options_"$PPP_IFACE";
+	fi
 echo "		$DNS1;
 		$DNS2;
 	};
