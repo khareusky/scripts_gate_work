@@ -1,8 +1,2 @@
-/data
-/temp
-/logs
-/bind
-
-./test.sh
-*.txt
-
+/confd
+*.ovpn
