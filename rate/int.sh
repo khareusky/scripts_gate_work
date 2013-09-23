@@ -13,6 +13,7 @@
  tc qdisc del dev $int root
  tc qdisc del dev ifb0 root
 
+exit 0;
  tc qdisc add dev $int root handle 1:0 htb default 5
  tc class add dev $int parent 1:0 classid 1:2 htb rate 100mbit burst 30k
  tc class add dev $int parent 1:2 classid 1:1 htb rate 20mbit burst 20k
@@ -84,7 +85,7 @@
         tc filter add dev ifb0 protocol ip parent 1:0 prio 2 u32 match ip src $ip match ip dport 3128 0xffff classid 1:"$(($uid+2))" # squid
         tc filter add dev ifb0 protocol ip parent 1:0 prio 2 u32 match ip src $ip match ip dport 8118 0xffff classid 1:"$(($uid+2))" # privoxy
         tc filter add dev ifb0 protocol ip parent 1:0 prio 2 u32 match ip src $ip match ip dport 9050 0xffff classid 1:"$(($uid+2))" # tor
-        
+
         tc filter add dev ifb0 protocol ip parent 1:0 prio 3 u32 match ip src $ip match ip protocol 0x2f 0xff classid 1:"$(($uid+3))" # pptp
         tc filter add dev ifb0 protocol ip parent 1:0 prio 3 u32 match ip src $ip classid 1:"$(($uid+3))" # all
         let "uid = uid + 4"
