@@ -1,0 +1,32 @@
+#!/bin/sh -e
+##########################################################
+/sbin/modprobe ip_nat_pptp
+/sbin/modprobe ip_tables
+/sbin/modprobe ip_conntrack
+/sbin/modprobe ip_conntrack_ftp
+/sbin/modprobe iptable_filter
+/sbin/modprobe iptable_mangle
+/sbin/modprobe iptable_nat
+/sbin/modprobe ip_nat_ftp
+/sbin/modprobe ipt_LOG
+/sbin/modprobe ipt_limit
+/sbin/modprobe ipt_state
+
+# Включение форвардинга
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# Включение форвардинга для VPN
+echo 1 > /proc/sys/net/ipv4/ip_dynaddr
+echo 0 > /proc/sys/net/ipv4/conf/all/rp_filter
+echo 0 > /proc/sys/net/ipv4/conf/default/rp_filter
+
+##########################################################
+iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+/etc/openvpn/down.sh
+
+##########################################################
+#/etc/openvpn/scripts/check.sh&
+/etc/openvpn/scripts/check_anonim.sh&
+
+##########################################################
+exit 0
