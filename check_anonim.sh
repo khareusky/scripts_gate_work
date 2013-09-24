@@ -1,10 +1,5 @@
 #!/bin/bash
-
-log() {
-    logger -t scriptname "$@";
-    echo "`date +%D\ %T` $@" >> /var/log/openvpn;
-#    echo "`date +%D\ %T` $@";
-}
+source /etc/openvpn/scripts/global.sh
 
 # проверка на запущенность #
 script_name="`basename $0`"

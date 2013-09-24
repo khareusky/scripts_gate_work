@@ -22,10 +22,10 @@ echo 0 > /proc/sys/net/ipv4/conf/default/rp_filter
 
 ##########################################################
 iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-/etc/openvpn/down.sh
+/etc/openvpn/scripts/down.sh
 
 ##########################################################
-#/etc/openvpn/scripts/check.sh&
+/etc/openvpn/scripts/check.sh&
 /etc/openvpn/scripts/check_anonim.sh&
 
 ##########################################################

@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################
-source /etc/openvpn/global.sh
+source /etc/openvpn/scripts/global.sh
 log "openvpn started"
 
 ip_tun0="`ip addr show tun0|grep inet -m 1| awk '{print $2}'| cut -d '/' -f1`";
