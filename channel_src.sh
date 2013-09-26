@@ -29,7 +29,7 @@ source global.sh
 	else if [[ "$channel" == "$ppp3" ]]; then
 		echo $ip >> "$squid_third_channel_src"
 	fi fi fi
- done < <(cat $path/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
+ done < <(cat $path/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 # перезапуск squid для применения настроек
  output "reload squid"
