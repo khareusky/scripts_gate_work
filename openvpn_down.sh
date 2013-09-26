@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################
-source /opt/global.sh
+source global.sh
 int_ip="`ip addr show $int_iface | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`"
 
 #############################################
@@ -19,7 +19,7 @@ log "iptables-save -t nat:
 # перезагрузка socks-сервера
 log "restart sock-server (danted)"
 /etc/init.d/danted stop >/dev/null 2>&1
-ln -f -s /etc/danted/eth0.conf /etc/danted.conf
+ln -f -s $path/danted/eth0.conf /etc/danted.conf
 /etc/init.d/danted start >/dev/null 2>&1
 
 #############################################

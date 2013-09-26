@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################
-source /opt/global.sh
+source global.sh
 openvpn_ip="`ip addr show $openvpn_iface | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`";
 
 #############################################
@@ -19,7 +19,7 @@ log "iptables-save -t nat:
 # перезагрузка socks-сервера
 log "restart sock-server (danted)"
 /etc/init.d/danted stop >/dev/null 2>&1
-ln -f -s /opt/danted/tun0.conf /etc/danted.conf
+ln -f -s $path/danted/tun0.conf /etc/danted.conf
 /etc/init.d/danted start >/dev/null 2>&1
 
 #############################################

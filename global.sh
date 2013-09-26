@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################
-path="/opt/"
+path=$(cd $(dirname $0) && pwd)
 int_iface="eth0"
 openvpn_iface="tun0"
 log_file="/var/log/syslog"

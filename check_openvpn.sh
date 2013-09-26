@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################
-source /opt/global.sh
+source global.sh
 check_ip="8.8.8.8"
 conf_file="/etc/openvpn/client.conf"
 conf_file_first="`ls /etc/openvpn/*.ovpn | head -n 1`"

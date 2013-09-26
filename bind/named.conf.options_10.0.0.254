@@ -1,4 +1,4 @@
-# изменяется скриптами /opt/*
+# изменяется скриптами
 options {
 	directory "/var/cache/bind";
 	forwarders {
