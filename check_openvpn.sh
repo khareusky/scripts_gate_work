@@ -1,7 +1,7 @@
 #!/bin/bash
 #############################################
 source /opt/global.sh
-check_ip="8.8.8.8"
+check_ip="217.175.26.230"
 conf_file="/etc/openvpn/client.conf"
 conf_file_first="`ls /etc/openvpn/*.ovpn | head -n 1`"
 
@@ -71,7 +71,7 @@ while [ true ]; do
 
         # запуск openvpn
         /etc/init.d/openvpn start >/dev/null
-        sleep 120;
+        sleep 60;
     fi
 done
 
