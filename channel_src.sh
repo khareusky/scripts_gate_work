@@ -2,7 +2,7 @@
 ###########################################################
 # распределение хостов по каналам из ip адресов ЛВС
 ###########################################################
-source /etc/gate/global.sh
+source global.sh
 
 ###########################################################
 ### SQUID SRC ###
@@ -29,7 +29,7 @@ source /etc/gate/global.sh
 	else if [[ "$channel" == "$ppp3" ]]; then
 		echo $ip >> "$squid_third_channel_src"
 	fi fi fi
- done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
+ done < <(cat $path/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 # перезапуск squid для применения настроек
  output "reload squid"
@@ -62,7 +62,7 @@ source /etc/gate/global.sh
 		ip rule add from "$ip" table "$channel" prio "$prio"
 		let "prio = prio + 1"
 	fi fi
- done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
+ done < <(cat $path/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
 ###########################################################
 output "###########################################################"

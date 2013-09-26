@@ -2,7 +2,7 @@
 #####################################
 # скрипт по открытию доступа wifi сети
 #####################################
-source /etc/gate/global.sh
+source global.sh
 wifi="$ext3"
 wifi_addr="`ip addr show $wifi | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
 wifi_lan="`ip addr show $wifi | grep inet -m 1 | awk '{print $2}'`";

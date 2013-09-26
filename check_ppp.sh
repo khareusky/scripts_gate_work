@@ -2,7 +2,7 @@
 #########################################################################
 # Скрипт для запуска и проверки функционирования PPPoE каналов
 #########################################################################
-source /etc/gate/global.sh
+source global.sh
 iface="$1"
 
 #########################################################################
@@ -47,7 +47,7 @@ while [ true ]; do
         log "START ping $iface";
         ip="`ip addr show $iface | grep inet -m 1| awk '{print $4}'| cut -d '/' -f1`"
         while [ true ]; do
-            ping -I "$iface" -s 1 -W 1 -c 5 -i 1 "$ip" >/dev/null || break;
+            ping -I "$iface" -s 1 -W 1 -c 5 -i 1 -n "$ip" >/dev/null || break;
         done
         log "STOP ping $iface";
         kill_ppp "$iface"
@@ -59,4 +59,3 @@ while [ true ]; do
 done
 
 #########################################################################
-exit 0;

@@ -1,6 +1,6 @@
 #!/bin/bash
 #####################################
-source /etc/gate/global.sh
+source global.sh
 ext1_addr="`ip addr show $ext1 | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
 ext2_addr="`ip addr show $ext2 | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
 ext3_addr="`ip addr show $ext3 | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";

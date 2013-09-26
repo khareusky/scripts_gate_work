@@ -2,23 +2,20 @@
 #############################################################
 # Данный скрипт запускается при подключении одного из PPPoE каналов для доступа в сеть Интернет.
 #############################################################
-source /etc/gate/global.sh
+source global.sh
 
 if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$ppp3" ]]; then # если канал является интернетовским
 	### LOG ###
 	echo "`date +%D\ %T` $0: CONNECT $PPP_IFACE: local ip = $PPP_LOCAL; remote ip = $PPP_REMOTE; dns1 = $DNS1; dns2 = $DNS2;" >> "$log_file"
 
-	### CHANNEL DST ###
-	#/etc/gate/channel/dst.sh auto
-
 	### ROUTE ###
-	/etc/gate/route_ppp_up.sh
+	$path/route_ppp_up.sh
 
 	### SNAT: Добавление: для подмены исходного ip адреса пакетов на ip адрес сетевого интерфейса при пробросе из ЛВС в сеть Интернет ###
 	iptables -t nat -A POSTROUTING ! -s "$PPP_LOCAL" -o "$PPP_IFACE" -j SNAT --to-source "$PPP_LOCAL"
 
 	### RATE ###
-	/etc/gate/rate/pppoe.sh
+	$path/rate/pppoe.sh
 
 	### Перезапуск DNS ###
 	# перезапись данных по перенаправлению на dns сервера подключившегося провайдера через его канал
@@ -28,7 +25,7 @@ if [[ "$PPP_IFACE" == "$ppp1" || "$PPP_IFACE" == "$ppp2" || "$PPP_IFACE" == "$pp
 	ip rule add to "$DNS2" table "$PPP_IFACE" prio 1"`echo -n $PPP_IFACE | tail -c 1`"1
 
 	# сохранение данных dns серверов провайдера
-	echo "# Данный файл изменяется скриптом /etc/gate/ppp_up.sh при подключении к каналам
+	echo "# Данный файл изменяется скриптом $path/ppp_up.sh при подключении к каналам
 # `date +%D\ %T` $PPP_IFACE
 options {
 	directory \"/var/cache/bind\";
@@ -63,14 +60,14 @@ echo "		$DNS1;
  			ip rule add to "$line" table temp97 prio "$prio"
  			let "prio = prio + 1"
  		done < <(host "$site" | grep has | awk '{print $4}')
-	done < <(cat /etc/gate/data/channel_dst_sites.txt | grep -v "^#" | grep "[^[:space:]]")
+	done < <(cat $path/data/channel_dst_sites.txt | grep -v "^#" | grep "[^[:space:]]")
 	
-	 rm -f "/etc/gate/data/squid3_forth_channel_dst.txt"
-	 touch "/etc/gate/data/squid3_forth_channel_dst.txt"
+	 rm -f "$path/data/squid3_forth_channel_dst.txt"
+	 touch "$path/data/squid3_forth_channel_dst.txt"
 
 	 while read site channel temp; do
-	    host "$site" | grep has | awk '{print $4}' >> "/etc/gate/data/squid3_forth_channel_dst.txt"
-	 done < <(cat /etc/gate/data/channel_dst_sites.txt | grep -v "^#" | grep "[^[:space:]]")
+	    host "$site" | grep has | awk '{print $4}' >> "$path/data/squid3_forth_channel_dst.txt"
+	 done < <(cat $path/data/channel_dst_sites.txt | grep -v "^#" | grep "[^[:space:]]")
 
 	 a=$(cat /var/run/squid3.pid 2>/dev/null)
 	 if [ "$a" == "" ]; then

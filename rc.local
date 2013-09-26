@@ -1,7 +1,7 @@
 #!/bin/sh -e
 #####################################
-. /etc/gate/global.sh # подключение файла с переменными
- /etc/gate/sysctl.sh # для подключения необходимых модулей, для настройки системы, для увеличения быстродействия сети
+. global.sh # подключение файла с переменными
+$path/sysctl.sh # для подключения необходимых модулей, для настройки системы, для увеличения быстродействия сети
 
 #####################################
 # ЛВС
@@ -38,16 +38,16 @@
  iptables -A OUTPUT -j FORWARD_DROP
 
  ip rule add to 10.0.0.0/24 table main prio 20
- /etc/gate/firewall.sh # циклы по записи хостов в пользовательские цепочки
- /etc/gate/channel_src.sh script # распределение по каналам
- /etc/gate/channel_dst.sh script
+ $path/firewall.sh # циклы по записи хостов в пользовательские цепочки
+ $path/channel_src.sh script # распределение по каналам
+ $path/channel_dst.sh script
 
 #####################################
 # SNAT
  iptables -N FORWARD_SNAT
  iptables -A FORWARD -i "$int" -j FORWARD_SNAT # список ip адресов ЛВС, кому будет разрешен доступ в сеть Интернет по технологии NAT 
 
- /etc/gate/snat.sh # заполнение цепочки данными; squid; ip rules
+ $path/snat.sh # заполнение цепочки данными; squid; ip rules
 
 #####################################
 # DNAT
@@ -65,7 +65,7 @@
  ip rule add fwmark 0x2/0x2 table "$ppp2" prio 72
  ip rule add fwmark 0x3/0x3 table "$ppp3" prio 73
 
- /etc/gate/dnat.sh # заполнение цепочек данными
+ $path/dnat.sh # заполнение цепочек данными
 
 #####################################
 # Перенаправление запрещенных сайтов на 10.0.0.97
@@ -76,7 +76,7 @@ ip route add default via 10.0.0.97 table temp97
  iptables -N FORWARD_ACCEPT
  iptables -A FORWARD -j FORWARD_ACCEPT # список строк, к которым будет разрешен прямой доступ по NAT (SNAT)
 
- /etc/gate/accept_dst_ip.sh script # заполнение цепочки данными
+ $path/accept_dst_ip.sh script # заполнение цепочки данными
 
 #####################################
 # LOGS
@@ -84,7 +84,7 @@ ip route add default via 10.0.0.97 table temp97
  iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu # принудительная корректировка MSS в пакетах всего транзитного траффика
  iptables -t mangle -A FORWARD -i "$int" -s 10.0.0.0/24 -m state --state NEW -j FORWARD_LOG # протоколирование компьютеров ЛВС у кого NAT
 
- /etc/gate/log.sh # заполнение цепочки FORWARD_LOG хостами
+ $path/log.sh # заполнение цепочки FORWARD_LOG хостами
 
 #####################################
 # распределение по каналам для SQUID
@@ -113,7 +113,7 @@ iptables -A FORWARD -j FORWARD_WIFI
 iptables -t nat -A POSTROUTING -j POSTROUTING_WIFI
 iptables -t mangle -A FORWARD -j FORWARD_WIFI
 
-"$path"/wifi.sh
+$path/wifi.sh
 
 #####################################
 # modems
@@ -123,20 +123,20 @@ iptables -t nat -N POSTROUTING_MODEM
 iptables -A FORWARD -j FORWARD_MODEM
 iptables -t nat -A POSTROUTING -j POSTROUTING_MODEM
 
-"$path"/modems.sh # модемы
+$path/modems.sh # модемы
 
 #####################################
-"$path"/rate/int.sh # ограничение по скорости
-"$path"/ssh_connect.sh& # поднимаем ssh подключение, через которое будем получать доступ к данному шлюзу
+$path/rate/int.sh # ограничение по скорости
+$path/ssh_connect.sh& # поднимаем ssh подключение, через которое будем получать доступ к данному шлюзу
 
 #####################################
 # скрипты для поддержания подключений в активном состоянии с помощью пинга
- /etc/gate/check_ppp.sh "$ppp1" >/dev/null 2>&1 &
- sleep 2
- /etc/gate/check_ppp.sh "$ppp2" >/dev/null 2>&1 &
- sleep 2
- /etc/gate/check_ppp.sh "$ppp3" >/dev/null 2>&1 &
- sleep 2
+$path/check_ppp.sh "$ppp1" >/dev/null 2>&1 &
+sleep 2
+$path/check_ppp.sh "$ppp2" >/dev/null 2>&1 &
+sleep 2
+$path/check_ppp.sh "$ppp3" >/dev/null 2>&1 &
+sleep 2
 
 #####################################
 exit 0
