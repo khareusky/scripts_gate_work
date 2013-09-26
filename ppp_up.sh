@@ -91,7 +91,7 @@ else
 	#ip route add $PPP_REMOTE dev $PPP_IFACE proto kernel scope link  src $PPP_LOCAL table static
 
 	### RATE ###
-	/etc/gate/rate/pptp.sh
+	$path/rate/pptp.sh
 fi
 
 ##########################################

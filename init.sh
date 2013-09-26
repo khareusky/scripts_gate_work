@@ -5,11 +5,20 @@ echo "path: $path"
 
 rm -f /usr/bin/global.sh
 ln -f -s $path/global.sh /usr/bin/global.sh
+#cp -f $path/global.sh /usr/bin/global.sh
 ls -lsa /usr/bin/global.sh
 
 rm -f /etc/rc.local
 ln -f -s $path/rc.local /etc/rc.local
 ls -lsa /etc/rc.local
+
+rm -f /etc/ppp/ip-up.d/ppp_up
+ln -f -s $path/ppp_up.sh /etc/ppp/ip-up.d/ppp_up
+ls -lsa /etc/ppp/ip-up.d/ppp_up
+
+rm -f /etc/ppp/ip-down.d/ppp_down
+ln -f -s $path/ppp_down.sh /etc/ppp/ip-down.d/ppp_down
+ls -lsa /etc/ppp/ip-down.d/ppp_down
 
 rm -f /etc/squid3
 ln -f -s $path/squid3 /etc/squid3

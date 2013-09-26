@@ -44,5 +44,5 @@
 		tc filter add dev $iface protocol ip parent 1:0 prio 3 u32 match ip dst $ip match ip src 0/0 classid 1:12 # other
 		break;
     fi
- done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
+ done < <(cat $path/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 #########################################################################

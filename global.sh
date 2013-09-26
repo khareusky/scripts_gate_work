@@ -8,7 +8,8 @@ ppp1="ppp101"
 ppp2="ppp102"
 ppp3="ppp103"
 ssh_port="1786"
-path=$(cd $(dirname $0) && pwd)
+#path=$(cd $(dirname $0) && pwd)
+path="/opt/scripts_gate_work"
 script_name="`basename $0`"
 log_file="/var/log/gate.log"
 

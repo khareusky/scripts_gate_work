@@ -33,7 +33,7 @@ kill_ppp() {
 
 #########################################################################
 # проверка на запущенность
-if [[ `ps uax | grep -v grep | grep -c "/bin/bash /etc/gate/check_ppp.sh $iface" 2>/dev/null` != "2" ]]; then
+if [[ `ps uax | grep -v grep | grep -c "/bin/bash $path/check_ppp.sh $iface" 2>/dev/null` != "2" ]]; then
     log "script is doubled, exit this one";
     exit 0;
 fi

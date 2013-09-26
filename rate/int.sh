@@ -89,5 +89,5 @@
         tc filter add dev ifb0 protocol ip parent 1:0 prio 3 u32 match ip src $ip match ip protocol 0x2f 0xff classid 1:"$(($uid+3))" # pptp
         tc filter add dev ifb0 protocol ip parent 1:0 prio 3 u32 match ip src $ip classid 1:"$(($uid+3))" # all
         let "uid = uid + 4"
- done < <(cat /etc/gate/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
+ done < <(cat $path/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 ################################################################
