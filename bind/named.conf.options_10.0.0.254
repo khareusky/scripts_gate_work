@@ -1,0 +1,16 @@
+# изменяется скриптами /opt/*
+options {
+	directory "/var/cache/bind";
+	forwarders {
+		10.0.0.97;
+		10.0.0.254;
+	};
+	forward only;
+	auth-nxdomain no;    # conform to RFC1035
+	listen-on { 127.0.0.1; 10.0.0.131; };
+	listen-on-v6 { none; };
+};
+
+logging {
+        category default { null; };
+};

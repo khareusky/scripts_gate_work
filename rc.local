@@ -1,6 +1,6 @@
 #!/bin/sh -e
 ##########################################################
-source /opt/global.sh
+. /opt/global.sh
 
 ##########################################################
 # syslog
@@ -29,7 +29,7 @@ iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-m
 
 $path/openvpn_down.sh
 $path/check_openvpn.sh&
-$path/check_anonim.sh&
+$path/check_dns.sh&
 
 ##########################################################
 exit 0

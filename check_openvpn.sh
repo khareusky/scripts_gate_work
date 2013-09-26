@@ -20,7 +20,7 @@ create_conf_file() {
 }
 
 #############################################
-# проверка на запущенность #
+# проверка на запущенность
 check_for_relaunching
 
 #############################################
@@ -43,12 +43,11 @@ while [ true ]; do
         sleep 2;
         killall openvpn >/dev/null 2>&1
 
-        # проверка на наличие конф файла
+        # выбор конф файла
         CONF_NEXT=0;
         if [[ ! -f "$conf_file" ]]; then
             CONF_NEXT="$conf_file_first"
         else
-            # выбор следующего конф файла
             conf_file_current="`head $conf_file -n 1 | cut -c 2-`"
             log "CURRENT: $conf_file_current";
 
@@ -65,13 +64,12 @@ while [ true ]; do
                 CONF_NEXT="$conf_file_first"
             fi
         fi
-
-        # создание конф файл
         log "NEXT: $CONF_NEXT";
+
+        # создание своего конф файла
         create_conf_file "$CONF_NEXT"
 
         # запуск openvpn
-        sleep 2;
         /etc/init.d/openvpn start >/dev/null
         sleep 120;
     fi

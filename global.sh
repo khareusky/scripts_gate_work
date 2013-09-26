@@ -3,6 +3,8 @@
 path="/opt/"
 int_iface="eth0"
 openvpn_iface="tun0"
+log_file="/var/log/syslog"
+PING="ping -s 1 -W 3 -c 3 -i 4 -n"
 
 #############################################
 log() {
