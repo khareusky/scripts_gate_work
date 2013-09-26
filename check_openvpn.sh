@@ -8,14 +8,25 @@ conf_file_first="`ls /etc/openvpn/*.ovpn | head -n 1`"
 #############################################
 create_conf_file() {
         conf_file_current="$1"
+
         echo "#$conf_file_current" > "$conf_file"
-        echo "# Этот файл изменяется скриптом $0" >> "$conf_file"
-        cat "$conf_file_current" >> "$conf_file"
+        echo "# этот файл изменяется скриптом: `basename $0`" >> "$conf_file"
+        echo "" >> "$conf_file"
         echo "###################################" >> "$conf_file"
-        echo "# Дополнения внесенные скриптом $0" >> "$conf_file"
+        echo "# main settings" >> "$conf_file"
+        cat "$conf_file_current" | grep -v "^#" | grep "[^[:space:]]" >> "$conf_file"
+
+        sed -i "/script-security/d" "$conf_file"
+        sed -i "/route-up/d" "$conf_file"
+        sed -i "/down/d" "$conf_file"
+
+        echo "" >> "$conf_file"
+        echo "###################################" >> "$conf_file"
+        echo "# additional settings" >> "$conf_file"
         echo "script-security 2" >> "$conf_file"
         echo "route-up $path/openvpn_up.sh" >> "$conf_file"
         echo "down $path/openvpn_down.sh" >> "$conf_file"
+        echo "" >> "$conf_file"
         echo "###################################" >> "$conf_file"
 }
 
