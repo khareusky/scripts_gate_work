@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################
-source /opt/global.sh
+source global.sh
 openvpn_ip="`ip addr show $openvpn_iface | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`";
 
 #############################################
