@@ -2,7 +2,6 @@
 #############################################
 path=$(cd $(dirname $0) && pwd);
 
-# первоначальная инициализация скриптов
 rm -f /usr/bin/global.sh
 ln -f -s $path/global.sh /usr/bin/global.sh
 
