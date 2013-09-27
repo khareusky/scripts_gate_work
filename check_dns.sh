@@ -15,7 +15,7 @@ chown bind:bind /etc/bind/named.conf.options
 
 #############################################
 # пинг известного ресурса
-ip="8.8.8.8";
+check_ip="8.8.8.8";
 while [ true ]; do
     $PING $ip >/dev/null 2>&1;
     if [[ "$?" == "0" ]]; then
@@ -24,12 +24,12 @@ while [ true ]; do
         chown bind:bind /etc/bind/named.conf.options
         /etc/init.d/bind9 restart >/dev/null 2>&1
 
-        log "START ping $ip";
+        log "started pinging $check_ip";
         while [ true ]; do
-            $PING $ip >/dev/null 2>&1 || break;
+            $PING $check_ip >/dev/null 2>&1 || break;
             sleep 10;
         done
-        log "STOP ping $ip";
+        log "stopped pinging";
 
         log "restart dns server to 10.0.0.254";
         cp -f $path/bind/named.conf.options_10.0.0.254 /etc/bind/named.conf.options

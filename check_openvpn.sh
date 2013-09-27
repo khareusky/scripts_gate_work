@@ -35,17 +35,19 @@ create_conf_file() {
 check_for_relaunching
 
 #############################################
-log "FIRST: $conf_file_first";
+log "first config file: $conf_file_first";
 while [ true ]; do
     ip addr show "$openvpn_iface" >/dev/null 2>&1; # проверка на поднятие openvpn интерфейса
     if [[ "$?" == "0" ]]; then
-        log "ping openvpn: START";
+        conf_file_current="`head $conf_file -n 1 | cut -c 2-`"
+        log "current config file: $conf_file_current";
+        log "started pinging $check_ip";
         while [ true ]; do
-            ping -I "$openvpn_iface" -c 4 -i 3 "$check_ip" >/dev/null 2>&1 || break
+            $PING -I "$openvpn_iface" "$check_ip" >/dev/null 2>&1 || break
             sleep 10;
         done
+        log "stopped pinging";
 
-        log "ping openvpn: STOP";
         /etc/init.d/openvpn stop >/dev/null 2>&1
         sleep 2;
     else
@@ -60,8 +62,6 @@ while [ true ]; do
             CONF_NEXT="$conf_file_first"
         else
             conf_file_current="`head $conf_file -n 1 | cut -c 2-`"
-            log "CURRENT: $conf_file_current";
-
             for i in /etc/openvpn/*.ovpn; do
                 if [[ "$CONF_NEXT" == "1" ]]; then
                     CONF_NEXT="$i";
@@ -75,7 +75,7 @@ while [ true ]; do
                 CONF_NEXT="$conf_file_first"
             fi
         fi
-        log "NEXT: $CONF_NEXT";
+        log "current config file: $CONF_NEXT";
 
         # создание своего конф файла
         create_conf_file "$CONF_NEXT"
