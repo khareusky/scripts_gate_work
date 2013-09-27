@@ -4,7 +4,7 @@ path=$(dirname "`ls -l /usr/bin/global.sh | awk '{$1=$2=$3=$4=$5=$6=$7=$8=$9=$10
 int_iface="eth0"
 openvpn_iface="tun0"
 log_file="/var/log/syslog"
-PING="ping -s 1 -W 3 -c 3 -i 4 -n"
+PING="ping -s 1 -W 2 -c 3 -i 4 -n"
 
 #############################################
 log() {
@@ -25,4 +25,5 @@ check_for_relaunching() {
         exit 0;
     fi
 }
+
 #############################################
