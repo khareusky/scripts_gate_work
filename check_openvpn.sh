@@ -9,7 +9,7 @@ conf_file_first="`ls /etc/openvpn/*.ovpn | head -n 1`"
 create_conf_file() {
         conf_file_current="$1"
         echo "#$conf_file_current" > "$conf_file"
-        echo "# этот файл изменяется скриптом: `basename $0`" >> "$conf_file"
+        echo "# этот файл изменяется скриптом: $path/`basename $0`" >> "$conf_file"
         echo "" >> "$conf_file"
         echo "###################################" >> "$conf_file"
         echo "# main settings" >> "$conf_file"

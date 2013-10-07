@@ -40,5 +40,7 @@ chmod 600 /root/.ssh/id_rsa
 mkdir /etc/openvpn/ # конф файлы openvpn
 tar -zxvf $path/openvpn.tar.gz -C /etc/openvpn/
 rm -f openvpn.tar.gz
+chmod 700 /etc/openvpn
+chmod -R 600 /etc/openvpn/*
 
 #############################################

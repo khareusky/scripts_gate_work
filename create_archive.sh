@@ -5,7 +5,7 @@ archive_name="data"
 
 #############################################
 # создание архива
-cd /opt/data # конф файлы openvpn
+cd /etc/openvpn # конф файлы openvpn
 tar zcf $path/openvpn.tar.gz *
 cd $path
 tar cf $path/$archive_name.tar openvpn.tar.gz
