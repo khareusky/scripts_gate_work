@@ -8,17 +8,14 @@ log "openvpn stopped"
 
 #############################################
 # forward
+log "restart iptables FORWARD"
 iptables -F FORWARD
-iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -A FORWARD -s 10.0.0.131 -o "$int_iface" -p tcp --dport 443 -j ACCEPT
-iptables -A FORWARD -s 10.0.0.131 -o "$int_iface" -p udp --dport 1194 -j ACCEPT
 iptables -P FORWARD DROP
 
 #############################################
 # snat
-log "restart iptables -t nat"
+log "restart iptables -t nat POSTROUTING"
 iptables -t nat -F
-iptables -t nat -A POSTROUTING ! -s "$int_ip" -o "$int_iface" -j SNAT --to-source "$int_ip"
 
 #############################################
 conntrack -F >/dev/null 2>&1

@@ -1,6 +1,5 @@
 #!/bin/bash
 #############################################
-#path=$(dirname "`ls -l /usr/bin/global.sh | awk '{$1=$2=$3=$4=$5=$6=$7=$8=$9=$10=""}1' | cut -c 11- `")
 path="/opt/scripts_gate_work"
 int_iface="eth0"
 openvpn_iface="tun0"

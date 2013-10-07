@@ -10,7 +10,7 @@ log "openvpn has started"
 # forward
 iptables -F FORWARD
 iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -A FORWARD -s 10.0.0.131 -j ACCEPT
+iptables -A FORWARD -i "$int_iface" -o "$openvpn_iface" -j ACCEPT
 iptables -P FORWARD DROP
 
 #############################################

@@ -19,6 +19,9 @@ tar rf $tmp/$archive_name.tar id_rsa
 cd /etc/bind # dns сервер
 tar rf $tmp/$archive_name.tar named.conf.options
 
+cd /etc/network # network
+tar rf $tmp/$archive_name.tar interfaces
+
 #############################################
 # компресия архива
 cd $tmp

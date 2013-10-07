@@ -34,19 +34,27 @@ gpg -o $tmp/$archive_name.tar.gz -d $path/$archive_name.tar.gz.gpg || exit 1;
 
 # декомпресия и деархифирование
 cd $tmp # общий архив
-tar -zxvf $archive_name.tar.gz -C $tmp/
+tar -zxf $archive_name.tar.gz -C $tmp/
 
 cp -f id_rsa /root/.ssh/ # ключ github
 chmod 600 /root/.ssh/id_rsa
+ls -lsa /root/.ssh/id_rsa
 
 mkdir /etc/openvpn/ # конф файлы openvpn
 tar -zxf openvpn.tar.gz -C /etc/openvpn/
 chmod 700 /etc/openvpn
 chmod -R 600 /etc/openvpn/*
+ls -lsa /etc/ | grep openvpn
 
 cp -f named.conf.options /etc/bind/ # bind
 chown root:bind /etc/bind/named.conf.options
 chmod 644 /etc/bind/named.conf.options
+ls -lsa /etc/bind/named.conf.options
+
+cp -f interfaces /etc/network/ # network
+chown root:root /etc/network/interfaces
+chmod 644 /etc/network/interfaces
+ls -lsa /etc/network/interfaces
 
 # удаление временной папки
 cd /
