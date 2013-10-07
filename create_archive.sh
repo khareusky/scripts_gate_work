@@ -2,28 +2,37 @@
 #############################################
 source global.sh
 archive_name="data"
+tmp="$path/tmp"
 
 #############################################
+mkdir $tmp
+
 # создание архива
 cd /etc/openvpn # конф файлы openvpn
-tar zcf $path/openvpn.tar.gz *
-cd $path
-tar cf $path/$archive_name.tar openvpn.tar.gz
-rm -f $path/openvpn.tar.gz
+tar zcf $tmp/openvpn.tar.gz *
+cd $tmp
+tar cf $archive_name.tar openvpn.tar.gz
 
 cd /root/.ssh # ключ github
-tar rf $path/$archive_name.tar id_rsa
+tar rf $tmp/$archive_name.tar id_rsa
+
+cd /etc/bind # dns сервер
+tar rf $tmp/$archive_name.tar named.conf.options
 
 #############################################
 # компресия архива
-cd $path
-gzip -f $path/$archive_name.tar
+cd $tmp
+gzip -f $archive_name.tar
 
 #############################################
 # криптование архива
 if [[ "$?" == "0" ]]; then
-    gpg --symmetric --cipher-algo aes256 -o $path/$archive_name.tar.gz.gpg $path/$archive_name.tar.gz
-    rm -f $path/$archive_name.tar.gz
+    gpg --symmetric --cipher-algo aes256 -o $path/$archive_name.tar.gz.gpg $tmp/$archive_name.tar.gz
 fi
+
+#############################################
+# удаление временной папки
+cd /
+rm -rf $tmp
 
 #############################################
