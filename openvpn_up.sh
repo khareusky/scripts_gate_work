@@ -20,8 +20,5 @@ log "restart iptables -t nat"
 iptables -t nat -F
 iptables -t nat -A POSTROUTING -s 10.0.0.131 -o "$openvpn_iface" -j SNAT --to-source "$openvpn_ip"
 
-log "iptables-save -t nat:
-`iptables-save -t nat`"
-
 #############################################
 conntrack -F >/dev/null 2>&1

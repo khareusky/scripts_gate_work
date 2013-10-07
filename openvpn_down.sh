@@ -19,8 +19,6 @@ iptables -P FORWARD DROP
 log "restart iptables -t nat"
 iptables -t nat -F
 iptables -t nat -A POSTROUTING ! -s "$int_ip" -o "$int_iface" -j SNAT --to-source "$int_ip"
-log "iptables-save -t nat:
-`iptables-save -t nat`"
 
 #############################################
 conntrack -F >/dev/null 2>&1
