@@ -22,7 +22,7 @@ gzip -f $path/$archive_name.tar
 #############################################
 # криптование архива
 if [[ "$?" == "0" ]]; then
-    gpg -c -o $path/$archive_name.tar.gz.gpg $path/$archive_name.tar.gz
+    gpg --symmetric --cipher-algo aes256 -o $path/$archive_name.tar.gz.gpg $path/$archive_name.tar.gz
     rm -f $path/$archive_name.tar.gz
 fi
 
