@@ -35,6 +35,7 @@ tar -zxvf $path/$archive_name.tar.gz -C $path/
 rm -f $path/$archive_name.tar.gz
 
 mv -f $path/id_rsa /root/.ssh/ # ключ github
+chmod 600 /root/.ssh/id_rsa
 
 mkdir /etc/openvpn/ # конф файлы openvpn
 tar -zxvf $path/openvpn.tar.gz -C /etc/openvpn/
