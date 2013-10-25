@@ -1,21 +1,24 @@
 #!/bin/bash
 #############################################
 source global.sh
-int_ip="`ip addr show $int_iface | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`"
-
-#############################################
 log "openvpn stopped"
 
 #############################################
-# forward
-log "restart iptables FORWARD"
+# iptables
+log "iptables restart to drop all"
+iptables -F INPUT_LAN
+
 iptables -F FORWARD
 iptables -P FORWARD DROP
 
-#############################################
-# snat
-log "restart iptables -t nat POSTROUTING"
 iptables -t nat -F
 
 #############################################
+# dns сервер
+log "restart dns server to forward"
+restart_dns $path/bind/named.conf.options_forward
+
+#############################################
+# очистка сессий
+log "flush connection sessions"
 conntrack -F >/dev/null 2>&1

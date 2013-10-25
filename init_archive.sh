@@ -40,15 +40,19 @@ cp -f id_rsa /root/.ssh/ # ключ github
 chmod 600 /root/.ssh/id_rsa
 ls -lsa /root/.ssh/id_rsa
 
-mkdir /etc/openvpn/ # конф файлы openvpn
+mkdir /etc/openvpn 2>/dev/null # конф файлы openvpn
 tar -zxf openvpn.tar.gz -C /etc/openvpn/
 chmod 700 /etc/openvpn
 chmod -R 600 /etc/openvpn/*
-ls -lsa /etc/ | grep openvpn
+ls -lsda /etc/openvpn
 
-cp -f named.conf.options /etc/bind/ # bind
+cp -f named.conf.options_forward $path/bind/ # bind
+cp -f named.conf.options_root $path/bind/
+cp -f $path/bind/named.conf.options_forward /etc/bind/named.conf.options
 chown root:bind /etc/bind/named.conf.options
 chmod 644 /etc/bind/named.conf.options
+ls -lsa $path/bind/named.conf.options_root
+ls -lsa $path/bind/named.conf.options_forward
 ls -lsa /etc/bind/named.conf.options
 
 cp -f interfaces /etc/network/ # network

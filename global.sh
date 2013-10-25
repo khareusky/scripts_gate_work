@@ -2,6 +2,8 @@
 #############################################
 path="/opt/scripts_gate_work"
 int_iface="eth0"
+int_addr="`ip addr show $int_iface | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
+int_lan="`ip addr show $int_iface | grep inet -m 1 | awk '{print $2}'`";
 openvpn_iface="tun0"
 log_file="/var/log/syslog"
 PING="ping -s 1 -W 2 -c 3 -i 4 -n"
@@ -27,3 +29,13 @@ check_for_relaunching() {
 }
 
 #############################################
+restart_dns() {
+    cp -f "$1" /etc/bind/named.conf.options
+    chown root:bind /etc/bind/named.conf.options
+    chmod 644 /etc/bind/named.conf.options
+    /etc/init.d/bind9 restart
+    rndc flush # очистка кеша
+}
+
+#############################################
+

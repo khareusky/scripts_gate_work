@@ -1,7 +1,7 @@
 #!/bin/bash
 #############################################
 source global.sh
-check_ip="217.175.26.230"
+check_ip="8.8.8.8"
 conf_file="/etc/openvpn/client.conf"
 conf_file_first="`ls /etc/openvpn/*.ovpn | head -n 1`"
 
@@ -27,7 +27,7 @@ create_conf_file() {
         echo "script-security 2" >> "$conf_file"
         echo "route-up $path/openvpn_up.sh" >> "$conf_file"
         echo "down $path/openvpn_down.sh" >> "$conf_file"
-        echo "link-mtu 1576" >> "$conf_file"
+        echo "tun-mtu 1500" >> "$conf_file"
         echo "auth-user-pass data" >> "$conf_file"
         echo "" >> "$conf_file"
         echo "###################################" >> "$conf_file"
@@ -44,21 +44,18 @@ while [ true ]; do
     if [[ "$?" == "0" ]]; then
         conf_file_current="`head $conf_file -n 1 | cut -c 2-`"
         log "current config file: $conf_file_current";
-        log "started pinging to $check_ip";
+        log "started pinging: $PING -I $openvpn_iface $check_ip";
         while [ true ]; do
             $PING -I "$openvpn_iface" "$check_ip" >/dev/null 2>&1 || break
             sleep 10;
         done
 
+        # отключение openvpn
         log "stopped pinging";
         /etc/init.d/openvpn stop >/dev/null 2>&1
         sleep 2;
-    else
-        # отключение openvpn
-        /etc/init.d/openvpn stop >/dev/null 2>&1
-        sleep 2;
         killall openvpn >/dev/null 2>&1
-
+    else
         # выбор конф файла
         CONF_NEXT=0;
         if [[ ! -f "$conf_file" ]]; then
