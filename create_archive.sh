@@ -1,14 +1,15 @@
 #!/bin/bash
 #############################################
-source global.sh
+path=$(cd $(dirname $0) && pwd)
 tmp="$path/tmp"
 
-echo "Введите имя архива [`hostname`]:"
+echo -n "Введите имя архива [`hostname`]: "
 read archive_name
 if [[ -z $archive_name ]]; then
     archive_name="`hostname`"
+
 fi
-log "Имя архива: $archive_name";
+echo "Имя архива: $archive_name"
 
 #############################################
 mkdir $tmp
@@ -24,15 +25,15 @@ cd /root/ # github config
 tar rf $tmp/$archive_name.tar .gitconfig
 ls -l /root/.gitconfig
 
-cd /etc/bind # dns сервер
+cd /etc/bind # dns
 tar rf $tmp/$archive_name.tar named.conf.options
 ls -l /etc/bind/named.conf.options
 
-cd $path # dante
+cd $path # socks
 tar rf $tmp/$archive_name.tar dante
 ls -lA $path/dante/*
 
-cd $path # squid3
+cd $path # squid
 tar rf $tmp/$archive_name.tar squid3
 ls -lA $path/squid3/*
 

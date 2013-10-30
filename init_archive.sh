@@ -2,6 +2,7 @@
 #############################################
 path=$(cd $(dirname $0) && pwd)
 tmp="$path/tmp"
+
 if [[ -z $1 ]]; then
     echo "Usage: $0 archive_name";
     exit 0;
@@ -52,12 +53,12 @@ chmod -R 600 $path/openvpn/*
 ln -sf $path/openvpn/conf /etc/openvpn
 ls -l /etc/openvpn
 
-cp -f named.conf.options /etc/bind/
+cp -f named.conf.options /etc/bind/ # dns
 chown root:root /etc/bind/named.conf.options
 chmod 644 /etc/bind/named.conf.options
 ls -l /etc/bind/named.conf.options
 
-rm -rf $path/dante 2>/dev/null # dante
+rm -rf $path/dante 2>/dev/null # socks
 cp -fr dante $path/
 ls -lA $path/dante/*
 
