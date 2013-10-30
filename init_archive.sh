@@ -1,7 +1,14 @@
 #!/bin/bash
 #############################################
 path=$(cd $(dirname $0) && pwd)
+tmp="$path/tmp"
+if [[ -z $1 ]]; then
+    echo "Usage: $0 archive_name";
+    exit 0;
+fi
+archive_name="$1"
 echo "path: $path"
+echo "archive_name: $archive_name"
 
 #############################################
 # ссылки
@@ -25,8 +32,6 @@ fi
 
 #############################################
 # архивированные данные
-archive_name="data"
-tmp="$path/tmp"
 mkdir $tmp
 
 # декодирование
@@ -44,7 +49,7 @@ rm -rf /etc/openvpn # конф файлы openvpn
 rm -rf $path/openvpn
 tar -zxf openvpn.tar.gz -C $path/
 chmod -R 600 $path/openvpn/*
-ln -sf $path/openvpn /etc/openvpn
+ln -sf $path/openvpn/conf /etc/openvpn
 ls -l /etc/openvpn
 
 cp -f named.conf.options /etc/bind/
@@ -66,11 +71,6 @@ cp -f interfaces /etc/network/ # network
 chown root:root /etc/network/interfaces
 chmod 644 /etc/network/interfaces
 ls -l /etc/network/interfaces
-
-cp -f rt_tables /etc/iproute2/ # rt_tables
-chown root:root /etc/iproute2/rt_tables
-chmod 644 /etc/iproute2/rt_tables
-ls -l /etc/iproute2/rt_tables
 
 cp -f crontab /etc/ # crontab
 chown root:root /etc/crontab

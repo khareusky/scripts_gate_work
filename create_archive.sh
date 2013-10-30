@@ -1,8 +1,14 @@
 #!/bin/bash
 #############################################
 source global.sh
-archive_name="data"
 tmp="$path/tmp"
+
+echo "Введите имя архива [`hostname`]:"
+read archive_name
+if [[ -z $archive_name ]]; then
+    archive_name="`hostname`"
+fi
+log "Имя архива: $archive_name";
 
 #############################################
 mkdir $tmp
@@ -33,10 +39,6 @@ ls -lA $path/squid3/*
 cd /etc/network # network
 tar rf $tmp/$archive_name.tar interfaces
 ls -l /etc/network/interfaces
-
-cd /etc/iproute2 # rt_tables
-tar rf $tmp/$archive_name.tar rt_tables
-ls -l /etc/iproute2/rt_tables
 
 cd /etc # crontab
 tar rf $tmp/$archive_name.tar crontab
