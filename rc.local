@@ -25,6 +25,7 @@ echo 0 > /proc/sys/net/ipv4/conf/all/rp_filter
 echo 0 > /proc/sys/net/ipv4/conf/default/rp_filter
 
 ##########################################################
+# iptables
 iptables -F
 iptables -X
 iptables -N INPUT_LAN
@@ -34,10 +35,16 @@ iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -i "$int_iface" -s "$int_lan" -d "$int_addr" -j INPUT_LAN
 iptables -A INPUT -j REJECT --reject-with icmp-net-unreachable
 iptables -P INPUT DROP
-
 iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
+##########################################################
+# начальное состояние
 $path/openvpn_down.sh
+
+# запуск ping для поддержания канала в активности
+ping 8.8.4.4&
+
+# запуск openvpn
 $path/check_openvpn.sh >/dev/null 2>&1 &
 
 ##########################################################

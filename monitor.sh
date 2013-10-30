@@ -5,7 +5,9 @@
 source global.sh # подключение файла с переменными
 
 if [[ -z "$1" ]]; then
-    tail -c 10000 -f "$log_file";
+    echo sttt | iftop -n -N -i eth0 -m 6M -f "net 10.0.0.0/24 and not host 10.0.0.1";
+else
+    tail -c 20000 -f "$log_file";
 fi
 
 ##########################################

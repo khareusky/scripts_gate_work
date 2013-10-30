@@ -8,25 +8,39 @@ tmp="$path/tmp"
 mkdir $tmp
 
 # создание архива
-cd /etc/openvpn # конф файлы openvpn
-tar zcf $tmp/openvpn.tar.gz *
+cd $path # конф файлы openvpn
+tar zcf $tmp/openvpn.tar.gz openvpn
 cd $tmp
 tar cf $archive_name.tar openvpn.tar.gz
-ls -lasd /etc/openvpn
+ls -ld $path/openvpn
 
 cd /root/.ssh # ключ github
 tar rf $tmp/$archive_name.tar id_rsa
-ls -lsa /root/.ssh/id_rsa
+ls -l /root/.ssh/id_rsa
 
-cd $path/bind # dns сервер
-tar rf $tmp/$archive_name.tar named.conf.options_root
-tar rf $tmp/$archive_name.tar named.conf.options_forward
-ls -lsa $path/bind/named.conf.options_root
-ls -lsa $path/bind/named.conf.options_forward
+cd /etc/bind # dns сервер
+tar rf $tmp/$archive_name.tar named.conf.options
+ls -l /etc/bind/named.conf.options
+
+cd $path # dante
+tar rf $tmp/$archive_name.tar dante
+ls -lA $path/dante/*
+
+cd $path # squid3
+tar rf $tmp/$archive_name.tar squid3
+ls -lA $path/squid3/*
 
 cd /etc/network # network
 tar rf $tmp/$archive_name.tar interfaces
-ls -lsa /etc/network/interfaces
+ls -l /etc/network/interfaces
+
+cd /etc/iproute2 # rt_tables
+tar rf $tmp/$archive_name.tar rt_tables
+ls -l /etc/iproute2/rt_tables
+
+cd /etc # crontab
+tar rf $tmp/$archive_name.tar crontab
+ls -l /etc/crontab
 
 #############################################
 # компресия архива

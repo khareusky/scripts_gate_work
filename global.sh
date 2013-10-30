@@ -7,6 +7,7 @@ int_lan="`ip addr show $int_iface | grep inet -m 1 | awk '{print $2}'`";
 openvpn_iface="tun0"
 log_file="/var/log/syslog"
 PING="ping -s 1 -W 2 -c 3 -i 4 -n"
+redirect_ip="10.0.0.131"
 
 #############################################
 log() {
@@ -26,15 +27,6 @@ check_for_relaunching() {
         log "script is doubled, exit this one";
         exit 0;
     fi
-}
-
-#############################################
-restart_dns() {
-    cp -f "$1" /etc/bind/named.conf.options
-    chown root:bind /etc/bind/named.conf.options
-    chmod 644 /etc/bind/named.conf.options
-    /etc/init.d/bind9 restart
-    rndc flush # очистка кеша
 }
 
 #############################################
