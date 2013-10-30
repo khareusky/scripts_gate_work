@@ -1,4 +1,5 @@
 test.sh
+config.sh
 dante
 squid3
 openvpn

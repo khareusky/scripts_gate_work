@@ -1,17 +1,16 @@
 #!/bin/bash
 #############################################
 path="/opt/scripts_gate_work"
+source $path/config.sh
 int_iface="eth0"
 int_addr="`ip addr show $int_iface | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
 int_lan="`ip addr show $int_iface | grep inet -m 1 | awk '{print $2}'`";
 openvpn_iface="tun0"
 log_file="/var/log/syslog"
-PING="ping -s 1 -W 2 -c 3 -i 4 -n"
-redirect_ip="10.0.0.131"
+script_name="`basename $0`"
 
 #############################################
 log() {
-    script_name="`basename $0`"
     ps x | grep -v grep | grep $$ | grep "+" >/dev/null # проверка на интерактивный запуск
     if [[ "$?" == "0" ]]; then
         echo "`date +%D\ %T` $script_name: $@"
@@ -22,10 +21,13 @@ log() {
 
 #############################################
 check_for_relaunching() {
-    script_name="`basename $0`"
-    if [[ `ps uax | grep -v grep | grep -c "$script_name" 2>/dev/null` != "2" ]]; then
-        log "script is doubled, exit this one";
+    pid_file="/tmp/$script_name.pid"
+    count=`ps -C $script_name | wc -l 2>/dev/null`;
+    if [[ -e "$pid_file" && "$count" -ge 4 ]]; then
+        log "script is DOUBLED, it will be exited";
         exit 0;
+    else
+        echo $$ > $pid_file;
     fi
 }
 

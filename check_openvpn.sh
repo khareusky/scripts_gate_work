@@ -1,8 +1,8 @@
 #!/bin/bash
 #############################################
 source global.sh
-conf_file="/etc/openvpn/client.conf"
-conf_file_first="`ls /etc/openvpn/*.ovpn | head -n 1`"
+conf_file="$path/openvpn/conf/client.conf"
+conf_file_first="`ls $path/openvpn/conf/*TCP.ovpn | head -n 1`"
 check_ip="8.8.8.8"
 
 #############################################
@@ -25,11 +25,11 @@ create_conf_file() {
         echo "###################################" >> "$conf_file"
         echo "# additional settings" >> "$conf_file"
         echo "script-security 2" >> "$conf_file"
-        echo "http-proxy 10.0.0.1 3128 proxy_accounts" >> "$conf_file"
+        echo "http-proxy 10.0.0.1 3128 $path/openvpn/proxy_accounts" >> "$conf_file"
         echo "route-up $path/openvpn_up.sh" >> "$conf_file"
         echo "down $path/openvpn_down.sh" >> "$conf_file"
         echo "tun-mtu 1500" >> "$conf_file"
-        echo "auth-user-pass data" >> "$conf_file"
+        echo "auth-user-pass $path/openvpn/data" >> "$conf_file"
         echo "" >> "$conf_file"
         echo "###################################" >> "$conf_file"
 }
@@ -63,7 +63,7 @@ while [ true ]; do
             CONF_NEXT="$conf_file_first"
         else
             conf_file_current="`head $conf_file -n 1 | cut -c 2-`"
-            for i in /etc/openvpn/*TCP.ovpn; do
+            for i in $path/openvpn/conf/*TCP.ovpn; do
                 if [[ "$CONF_NEXT" == "1" ]]; then
                     CONF_NEXT="$i";
                     break;
