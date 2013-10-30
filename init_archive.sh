@@ -36,9 +36,9 @@ gpg -o $tmp/$archive_name.tar.gz -d $path/$archive_name.tar.gz.gpg || exit 1;
 cd $tmp # общий архив
 tar -zxf $archive_name.tar.gz -C $tmp/
 
-cp -f id_rsa /root/.ssh/ # ключ github
-chmod 600 /root/.ssh/id_rsa
-ls -l /root/.ssh/id_rsa
+cp -f .gitconfig /root/ # github config
+chmod 600 /root/.gitconfig
+ls -l /root/.gitconfig
 
 rm -rf /etc/openvpn # конф файлы openvpn
 rm -rf $path/openvpn

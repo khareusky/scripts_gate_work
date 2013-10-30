@@ -14,9 +14,9 @@ cd $tmp
 tar cf $archive_name.tar openvpn.tar.gz
 ls -ld $path/openvpn
 
-cd /root/.ssh # ключ github
-tar rf $tmp/$archive_name.tar id_rsa
-ls -l /root/.ssh/id_rsa
+cd /root/ # github config
+tar rf $tmp/$archive_name.tar .gitconfig
+ls -l /root/.gitconfig
 
 cd /etc/bind # dns сервер
 tar rf $tmp/$archive_name.tar named.conf.options
