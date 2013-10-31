@@ -42,7 +42,7 @@ iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-m
 $path/openvpn_down.sh
 
 # запуск ping для поддержания канала в активности
-ping 8.8.4.4&
+ping "$check_ip"&
 
 # запуск openvpn
 $path/check_openvpn.sh >/dev/null 2>&1 &

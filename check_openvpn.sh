@@ -3,7 +3,6 @@
 source global.sh
 conf_file="$path/openvpn/conf/client.conf"
 conf_file_first="`ls $regexp_openvpn_files | head -n 1`"
-check_ip="8.8.8.8"
 PING="ping -s 1 -W 3 -c 3 -i 4 -n"
 
 #############################################
@@ -46,9 +45,13 @@ while [ true ]; do
     if [[ "$?" == "0" ]]; then
         conf_file_current="`head $conf_file -n 1 | cut -c 2-`"
         log "current config file: $conf_file_current";
-        log "started pinging: $PING -I $openvpn_iface $check_ip";
+#        log "started pinging: $PING -I $openvpn_iface $check_ip";
         while [ true ]; do
-            $PING -I "$openvpn_iface" "$check_ip" >/dev/null 2>&1 || break
+#            $PING -I "$openvpn_iface" "$check_ip" >/dev/null 2>&1 || break
+            ip addr show "$openvpn_iface" >/dev/null 2>&1; # проверка на поднятие openvpn интерфейса
+            if [[ $? -ne 0 ]]; then
+                break;
+            fi
             sleep 10;
         done
 

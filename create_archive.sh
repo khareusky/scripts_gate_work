@@ -59,7 +59,7 @@ fi
 
 #############################################
 # удаление временной папки
-log "remove temp dir"
+echo "remove temp dir"
 cd /
 rm -rf $tmp
 
