@@ -45,7 +45,7 @@ $path/openvpn_down.sh
 ping "$check_ip"&
 
 # запуск openvpn
-$path/check_openvpn.sh >/dev/null 2>&1 &
+#$path/check_openvpn.sh >/dev/null 2>&1 &
 
 ##########################################################
 exit 0

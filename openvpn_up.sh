@@ -2,15 +2,14 @@
 #############################################
 source global.sh
 openvpn_addr="`ip addr show $openvpn_iface | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`";
-log "openvpn has just connected"
+log "openvpn has just connected: $*"
 
 #############################################
 # default route
 log "restart default route to redirect traffic throw tun0"
-ip route del default >/dev/null
-ip route add default dev "$openvpn_iface"
-ip route flush cache
-
+#ip route del default >/dev/null
+#ip route add default dev "$openvpn_iface"
+#ip route flush cache
 
 #############################################
 # iptables

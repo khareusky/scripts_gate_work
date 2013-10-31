@@ -18,7 +18,7 @@ create_conf_file() {
         sed -i "/script-security/d" "$conf_file"
         sed -i "/route-up/d" "$conf_file"
         sed -i "/down/d" "$conf_file"
-        sed -i "/link-mtu/d" "$conf_file"
+#        sed -i "/link-mtu/d" "$conf_file"
         sed -i "/auth-user-pass/d" "$conf_file"
 
         echo "" >> "$conf_file"
@@ -67,7 +67,7 @@ while [ true ]; do
             CONF_NEXT="$conf_file_first"
         else
             conf_file_current="`head $conf_file -n 1 | cut -c 2-`"
-            for i in "$regexp_openvpn_files"; do
+            for i in $regexp_openvpn_files; do
                 if [[ "$CONF_NEXT" == "1" ]]; then
                     CONF_NEXT="$i";
                     break;
