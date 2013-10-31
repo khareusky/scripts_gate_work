@@ -2,8 +2,9 @@
 #############################################
 source global.sh
 conf_file="$path/openvpn/conf/client.conf"
-conf_file_first="`ls $path/openvpn/conf/*TCP.ovpn | head -n 1`"
+conf_file_first="`ls $regexp_openvpn_files | head -n 1`"
 check_ip="8.8.8.8"
+PING="ping -s 1 -W 3 -c 3 -i 4 -n"
 
 #############################################
 create_conf_file() {
@@ -63,7 +64,7 @@ while [ true ]; do
             CONF_NEXT="$conf_file_first"
         else
             conf_file_current="`head $conf_file -n 1 | cut -c 2-`"
-            for i in $path/openvpn/conf/*TCP.ovpn; do
+            for i in "$regexp_openvpn_files"; do
                 if [[ "$CONF_NEXT" == "1" ]]; then
                     CONF_NEXT="$i";
                     break;
