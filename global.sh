@@ -1,40 +1,33 @@
 #!/bin/bash
 #########################################################################
-int="eth3"
-ext1="eth0"
-ext2="eth1"
-ext3="eth2"
-ppp1="ppp101"
-ppp2="ppp102"
-ppp3="ppp103"
+int="eth0"
 ssh_port="1786"
-path="/etc/gate/"
+path="/opt/scripts_gate_work"
+log_file="/var/log/syslog"
+int_addr="`ip addr show $int | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`"
+int_lan="`ip addr show $int | grep inet -m 1 | awk '{print $2}'`"
 script_name="`basename $0`"
-log_file="/var/log/gate.log"
 
-int_addr="`ip addr show $int | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
-int_lan="`ip addr show $int | grep inet -m 1 | awk '{print $2}'`";
-
-#########################################################################
-squid_first_channel_src="/etc/gate/data/squid3_first_channel_src.txt"
-squid_second_channel_src="/etc/gate/data/squid3_second_channel_src.txt"
-squid_third_channel_src="/etc/gate/data/squid3_third_channel_src.txt"
-squid_first_channel_dst="/etc/gate/data/squid3_first_channel_dst.txt"
-squid_second_channel_dst="/etc/gate/data/squid3_second_channel_dst.txt"
-squid_third_channel_dst="/etc/gate/data/squid3_third_channel_dst.txt"
-
-#########################################################################
-# вывод на консоль
-out="$1"
-output() {
-    if [[ -z "$out" ]]; then
-        echo "$script_name: $1";
+#############################################
+log() {
+    ps x | grep -v grep | grep $$ | grep "+" >/dev/null # проверка на интерактивный запуск
+    if [[ "$?" == "0" ]]; then
+        echo "`date +%D\ %T` $script_name: $@"
+    else
+        logger -t "$script_name" "$@";
     fi
 }
-#########################################################################
-# вывод в файл
-log() {
-    echo "`date +%D\ %T` $script_name: $1" >> "$log_file";
+
+#############################################
+check_for_relaunching() {
+    pid_file="/tmp/$script_name.pid"
+    count=`ps -C $script_name | wc -l 2>/dev/null`;
+    if [[ -e "$pid_file" && "$count" -ge 4 ]]; then
+        log "script is DOUBLED, it will be exited";
+        exit 0;
+    else
+        echo $$ > $pid_file;
+    fi
 }
 
-#########################################################################
+#############################################
