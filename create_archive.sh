@@ -45,6 +45,10 @@ cd /etc # crontab
 tar rf $tmp/$archive_name.tar crontab
 ls -l /etc/crontab
 
+cd $path # config.sh
+tar rf $tmp/$archive_name.tar config.sh
+ls -l $path/config.sh
+
 #############################################
 # компресия архива
 cd $tmp

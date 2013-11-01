@@ -80,6 +80,10 @@ ls -l /etc/crontab
 echo "restart cron"
 /etc/init.d/cron restart >/dev/null 2>&1
 
+cp -f config.sh $path/ # config.sh
+chmod 644 $path/config.sh
+ls -l $path/config.sh
+
 # удаление временной папки
 cd /
 rm -rf $tmp
