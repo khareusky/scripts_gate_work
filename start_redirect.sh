@@ -6,8 +6,8 @@ source global.sh
 # route
 log "restart default route to redirect traffic throw $redirect_ip"
 ip route flush table main
-ip route add default via "$redirect_ip"
 ip route add "$int_lan" dev "$int_iface"
+ip route add default via "$redirect_ip"
 ip route flush cache
 
 #############################################
