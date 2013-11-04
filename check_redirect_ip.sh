@@ -7,8 +7,16 @@ source global.sh
 check_for_relaunching
 
 #############################################
+# проверка на поднятие openvpn интерфейса
+ip addr show "$openvpn_iface" >/dev/null 2>&1;
+if [[ $? -eq 0 ]]; then
+    log "exit $script_name"
+    exit 0;
+fi
+
+#############################################
 # начальная установка состояния системы
-log "apply initial state"
+log "set up initial state"
 initial_state="0"
 ping -s 1 -W 2 -c 1 -i 1 -n -I "$int_iface" "$redirect_ip" >/dev/null 2>&1
 if [[ "$?" == "0" ]]; then
@@ -27,6 +35,7 @@ while [ true ]; do
     ip addr show "$openvpn_iface" >/dev/null 2>&1;
     if [[ $? -eq 0 ]]; then
         log "stop checking $redirect_ip"
+        log "exit $script_name"
         exit 0;
     fi
 

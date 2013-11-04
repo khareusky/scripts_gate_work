@@ -4,8 +4,6 @@ source global.sh
 conf_file="$path/openvpn/conf/client.conf"
 conf_file_first="`ls $regexp_openvpn_files | head -n 1`"
 PING="ping -s 1 -W 3 -c 3 -i 4 -n"
-proxy_ip="10.0.0.1"
-proxy_port="3128"
 
 #############################################
 create_conf_file() {
@@ -20,7 +18,6 @@ create_conf_file() {
         sed -i "/script-security/d" "$conf_file"
         sed -i "/route-up/d" "$conf_file"
         sed -i "/down/d" "$conf_file"
-#        sed -i "/link-mtu/d" "$conf_file"
         sed -i "/auth-user-pass/d" "$conf_file"
 
         echo "" >> "$conf_file"
@@ -31,7 +28,6 @@ create_conf_file() {
         echo "http-proxy-retry" >> "$conf_file"
         echo "route-up $path/openvpn_up.sh" >> "$conf_file"
         echo "down $path/openvpn_down.sh" >> "$conf_file"
-#        echo "tun-mtu 1500" >> "$conf_file"
         echo "auth-user-pass $path/openvpn/data" >> "$conf_file"
         echo "" >> "$conf_file"
         echo "###################################" >> "$conf_file"
@@ -48,9 +44,8 @@ while [ true ]; do
     if [[ "$?" == "0" ]]; then
         conf_file_current="`head $conf_file -n 1 | cut -c 2-`"
         log "current config file: $conf_file_current";
-#        log "started pinging: $PING -I $openvpn_iface $check_ip";
+        log "start waiting...";
         while [ true ]; do
-#            $PING -I "$openvpn_iface" "$check_ip" >/dev/null 2>&1 || break
             ip addr show "$openvpn_iface" >/dev/null 2>&1; # проверка на поднятие openvpn интерфейса
             if [[ $? -ne 0 ]]; then
                 break;
