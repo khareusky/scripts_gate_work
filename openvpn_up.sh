@@ -9,9 +9,9 @@ log "openvpn has just connected"
 # default route
 log "restart route to redirect traffic throw $openvpn_iface"
 ip route flush table main
-ip route add default dev "$openvpn_iface"
 ip route add "$int_lan" dev "$int_iface"
 ip route add "$openvpn_lan" dev "$openvpn_iface"
+ip route add default dev "$openvpn_iface"
 ip route flush cache
 
 #############################################
@@ -49,10 +49,5 @@ ln -f -s $path/dante/dante_tun0.conf /etc/danted.conf
 # squid
 log "start squid to connect throw $openvpn_iface"
 /etc/init.d/squid3 start
-
-#############################################
-# очистка сессий
-log "flush connection sessions"
-conntrack -F >/dev/null 2>&1
 
 #############################################
