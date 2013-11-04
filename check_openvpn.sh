@@ -4,6 +4,8 @@ source global.sh
 conf_file="$path/openvpn/conf/client.conf"
 conf_file_first="`ls $regexp_openvpn_files | head -n 1`"
 PING="ping -s 1 -W 3 -c 3 -i 4 -n"
+proxy_ip="10.0.0.1"
+proxy_port="3128"
 
 #############################################
 create_conf_file() {
@@ -25,10 +27,11 @@ create_conf_file() {
         echo "###################################" >> "$conf_file"
         echo "# additional settings" >> "$conf_file"
         echo "script-security 2" >> "$conf_file"
-        echo "http-proxy 10.0.0.1 3128 $path/openvpn/proxy_accounts" >> "$conf_file"
+        echo "http-proxy $proxy_ip $proxy_port $path/openvpn/proxy_accounts" >> "$conf_file"
+        echo "http-proxy-retry" >> "$conf_file"
         echo "route-up $path/openvpn_up.sh" >> "$conf_file"
         echo "down $path/openvpn_down.sh" >> "$conf_file"
-        echo "tun-mtu 1500" >> "$conf_file"
+#        echo "tun-mtu 1500" >> "$conf_file"
         echo "auth-user-pass $path/openvpn/data" >> "$conf_file"
         echo "" >> "$conf_file"
         echo "###################################" >> "$conf_file"
