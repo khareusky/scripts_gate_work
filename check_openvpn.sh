@@ -25,7 +25,6 @@ create_conf_file() {
         echo "# additional settings" >> "$conf_file"
         echo "script-security 2" >> "$conf_file"
         echo "http-proxy $proxy_ip $proxy_port $path/openvpn/proxy_accounts" >> "$conf_file"
-        echo "http-proxy-retry" >> "$conf_file"
         echo "route-up $path/openvpn_up.sh" >> "$conf_file"
         echo "down $path/openvpn_down.sh" >> "$conf_file"
         echo "auth-user-pass $path/openvpn/data" >> "$conf_file"
