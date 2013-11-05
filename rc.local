@@ -2,6 +2,69 @@
 #####################################
 source global.sh
 
-log $script_name
+#####################################
+# syslog
+log "set up syslog settings"
+
+# ifb
+/sbin/modprobe ifb
+ip link set dev ifb0 up
+
+# iptables
+/sbin/modprobe ip_nat_pptp
+/sbin/modprobe ip_tables
+/sbin/modprobe ip_conntrack
+/sbin/modprobe ip_conntrack_ftp
+/sbin/modprobe iptable_filter
+/sbin/modprobe iptable_mangle
+/sbin/modprobe iptable_nat
+/sbin/modprobe ip_nat_ftp
+/sbin/modprobe ipt_LOG
+/sbin/modprobe ipt_limit
+/sbin/modprobe ipt_state
+
+# Включение форвардинга
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# Включение форвардинга
+echo 1 > /proc/sys/net/ipv4/ip_dynaddr
+echo 0 > /proc/sys/net/ipv4/conf/all/rp_filter
+echo 0 > /proc/sys/net/ipv4/conf/default/rp_filter
 
 #####################################
+# common iptables
+log "set up common iptables settings"
+
+iptables --flush -t filter
+iptables --flush -t nat
+iptables --flush -t mangle
+iptables --delete-chain
+
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -p tcp --dport "$ssh_port" -j ACCEPT
+iptables -A INPUT -i "$int" -p udp --dport 53 -j ACCEPT
+iptables -A INPUT -j REJECT --reject-with icmp-net-unreachable
+iptables -P INPUT DROP
+
+iptables -N FORWARD_46
+iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -i "$int" -s 46.34.130.0/24 -j FORWARD_46
+iptables -A FORWARD -i "$int" -d 46.34.130.0/24 -j FORWARD_46
+iptables -A FORWARD -j REJECT --reject-with icmp-net-unreachable
+iptables -P FORWARD DROP
+
+iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+#####################################
+# 46.34.130.0/24
+$path/ext46.sh
+
+#####################################
+# rate
+$path/rate.sh
+
+#####################################
+
+exit 0;

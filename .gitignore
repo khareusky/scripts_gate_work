@@ -1,4 +1,6 @@
-/temp
-./test.sh
+temp
+data
+
+test.sh
 *.txt
 
