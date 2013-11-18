@@ -7,14 +7,14 @@ ext3="eth2"
 ppp1="ppp101"
 ppp2="ppp102"
 ppp3="ppp103"
-ssh_port="1786"
-#path=$(cd $(dirname $0) && pwd)
+ssh_port="22"
 path="/opt/scripts_gate_work"
 script_name="`basename $0`"
 log_file="/var/log/gate.log"
 
 int_addr="`ip addr show $int | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
 int_lan="`ip addr show $int | grep inet -m 1 | awk '{print $2}'`";
+hosts_params="ip proxy nat channel rate_down rate_up log comment"
 
 #########################################################################
 squid_first_channel_src="$path/data/squid3_first_channel_src.txt"

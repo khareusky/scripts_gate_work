@@ -1,13 +1,12 @@
-#!/bin/sh -e
+#!/bin/bash
 #####################################
-. global.sh # подключение файла с переменными
+source global.sh # подключение файла с переменными
 $path/sysctl.sh # для подключения необходимых модулей, для настройки системы, для увеличения быстродействия сети
 
 #####################################
 # ЛВС
 # создание пользовательских цепочек
  iptables -N INPUT_PROXY
- iptables -N INPUT_PPTP
  iptables -N FORWARD_DROP
 
  ### FILTER INPUT ###
@@ -17,16 +16,11 @@ $path/sysctl.sh # для подключения необходимых моду�
  iptables -A INPUT -i lo -j ACCEPT
 
  iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p tcp --dport 3128 -j INPUT_PROXY # squid
+ iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p tcp --dport 1080 -j INPUT_PROXY # socks
  iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p udp --dport 53 -j ACCEPT # dns
  iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p tcp --dport 8118 -j ACCEPT # privoxy
  iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p tcp --dport 9050 -j ACCEPT # tor
- iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p tcp --dport 1723 -j INPUT_PPTP # для подключения pptp
- iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p gre -j INPUT_PPTP # для подключения pptp
  iptables -A INPUT -i "$int" -s 10.0.0.0/24 -p icmp -j ACCEPT # icmp
-
- iptables -A INPUT -s 172.25.12.0/24 -p tcp --dport 3128 -j INPUT_PROXY # squid pptp
- iptables -A INPUT -s 172.25.12.0/24 -p udp --dport 53 -j ACCEPT # dns pptp
- iptables -A INPUT -s 172.25.12.0/24 -p icmp -j ACCEPT # icmp pptp
 
 ### FILTER FORWARD ###
  iptables -P FORWARD DROP # состояние по-умолчанию, когда ни одно из правил не сработало
@@ -59,11 +53,11 @@ $path/sysctl.sh # для подключения необходимых моду�
 
  iptables -t mangle -N PREROUTING_DNAT # пользовательская цепочка для днатированых пакетов, чтобы пакеты уходили в теже каналы
  iptables -t mangle -A PREROUTING -j PREROUTING_DNAT
- iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет в ЛВС) перенаправлялись на теже Интернет-каналы
 
- ip rule add fwmark 0x1/0x1 table "$ppp1" prio 71 # правила для того чтобы пакеты уходили в нужные каналы
- ip rule add fwmark 0x2/0x2 table "$ppp2" prio 72
- ip rule add fwmark 0x3/0x3 table "$ppp3" prio 73
+
+ ip rule add fwmark 1 table "$ppp1" prio 71 # правила для того чтобы пакеты уходили в нужные каналы
+ ip rule add fwmark 2 table "$ppp2" prio 72
+ ip rule add fwmark 3 table "$ppp3" prio 73
 
  $path/dnat.sh # заполнение цепочек данными
 
@@ -91,15 +85,10 @@ ip route add default via 10.0.0.97 table temp97
  ip rule add from 10.1.0.254 table "$ppp1" prio 61
  ip rule add from 10.2.0.254 table "$ppp2" prio 62
  ip rule add from 10.3.0.254 table "$ppp3" prio 63
- ip rule add from 10.4.0.254 table temp97 prio 67
 
  ip rule add to 10.1.0.254 table main prio 64
  ip rule add to 10.2.0.254 table main prio 65
  ip rule add to 10.3.0.254 table main prio 66
- ip rule add to 10.4.0.254 table main prio 68
-
- iptables -t nat -A POSTROUTING -o "$int" -s 10.4.0.254 -j SNAT --to-source 10.0.0.129
- iptables -t nat -A POSTROUTING -d 10.0.0.79 -o "$int" -j SNAT --to-source 10.0.0.129
 
 #####################################
 # wifi
@@ -107,11 +96,13 @@ iptables -N INPUT_WIFI
 iptables -N FORWARD_WIFI
 iptables -t nat -N POSTROUTING_WIFI
 iptables -t mangle -N FORWARD_WIFI
+iptables -t mangle -N PREROUTING_WIFI
 
 iptables -A INPUT -j INPUT_WIFI
 iptables -A FORWARD -j FORWARD_WIFI
 iptables -t nat -A POSTROUTING -j POSTROUTING_WIFI
 iptables -t mangle -A FORWARD -j FORWARD_WIFI
+iptables -t mangle -A PREROUTING -j PREROUTING_WIFI
 
 $path/wifi.sh
 
@@ -133,10 +124,18 @@ $path/ssh_connect.sh& # поднимаем ssh подключение, чере�
 # скрипты для поддержания подключений в активном состоянии с помощью пинга
 $path/check_ppp.sh "$ppp1" >/dev/null 2>&1 &
 sleep 2
-$path/check_ppp.sh "$ppp2" >/dev/null 2>&1 &
-sleep 2
+#$path/check_ppp.sh "$ppp2" >/dev/null 2>&1 &
+#sleep 2
 $path/check_ppp.sh "$ppp3" >/dev/null 2>&1 &
 sleep 2
 
 #####################################
+# start socks server
+export SS5_PASSWORD_FILE="/etc/ss5/ss5.passwd"
+/etc/init.d/ss5 start
+
+#####################################
+iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапуск маркировки пакетов, чтобы ответные пакеты на пакеты запросов (из сети Инетернет в ЛВС) перенаправлялись на теже Интернет-каналы
+iptables -t mangle -A OUTPUT -j CONNMARK --restore-mark
+
 exit 0

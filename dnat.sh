@@ -14,15 +14,15 @@ fill() {
 	done < <(cat $path/data/list_dnat.txt | grep -v "^#" | grep "[^[:space:]]")
 }
 
- iptables -t nat -F PREROUTING_DNAT
- iptables -t mangle -F PREROUTING_DNAT
- iptables -F FORWARD_DNAT
- while read dport1 ip_dst dport2 temp; do
+iptables -t nat -F PREROUTING_DNAT
+iptables -t mangle -F PREROUTING_DNAT
+iptables -F FORWARD_DNAT
+while read dport1 ip_dst dport2 temp; do
     iptables -A FORWARD_DNAT -o "$int" -d "$ip_dst" -p tcp --dport "$dport2" -j ACCEPT
     iptables -A FORWARD_DNAT -i "$int" -s "$ip_dst" -p tcp --sport "$dport2" -j ACCEPT
- done < <(cat $path/data/list_dnat.txt | grep -v "^#" | grep "[^[:space:]]")
- fill "$ppp1"
- fill "$ppp2"
- fill "$ppp3"
+done < <(cat $path/data/list_dnat.txt | grep -v "^#" | grep "[^[:space:]]")
+fill "$ppp1"
+fill "$ppp2"
+fill "$ppp3"
 
 ###########################################################

@@ -13,7 +13,7 @@
  tc qdisc del dev $int root
  tc qdisc del dev ifb0 root
 
-#exit 0;
+# exit 0;
  tc qdisc add dev $int root handle 1:0 htb default 5
  tc class add dev $int parent 1:0 classid 1:2 htb rate 100mbit burst 30k
  tc class add dev $int parent 1:2 classid 1:1 htb rate 20mbit burst 20k
@@ -30,15 +30,13 @@
  tc qdisc add dev $int ingress
  tc filter add dev $int parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev ifb0
 
- while read name server passwd ip iface proxy nat pptp channel rate1 rate2 log comment
- do
-        if [ "$iface" != "int" ]; then
-            continue
-        fi
-        if [ "$rate1" == "*" ]; then
+ while read $hosts_params; do
+        rate1="$rate_down";
+        rate2="$rate_up";
+        if [ "$rate_down" == "*" ]; then
             rate1=$rate_down_default
         fi
-        if [ "$rate2" == "*" ]; then
+        if [ "$rate_up" == "*" ]; then
             rate2=$rate_up_default
         fi
 

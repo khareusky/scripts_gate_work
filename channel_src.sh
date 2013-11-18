@@ -18,7 +18,7 @@ source global.sh
  touch "$squid_third_channel_src"
 
 # заполнение файлов
- while read name server passwd ip iface proxy nat pptp channel temp; do
+ while read $hosts_params; do
 	if [[ "$proxy" != "1" ]]; then
 	    continue
 	fi
@@ -51,7 +51,7 @@ source global.sh
 # заполнения правил для тех, у кого NAT
  output "add new rules"
  prio=20000
- while read name server passwd ip iface proxy nat pptp channel temp; do
+ while read $hosts_params; do
 	if [[ "$nat" != "1" ]]; then
 		continue
 	fi

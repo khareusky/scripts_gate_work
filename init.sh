@@ -77,4 +77,8 @@ rm -f /etc/ppp/peers/ppp103
 ln -f -s $path/data/settings_ppp103.txt /etc/ppp/peers/ppp103
 ls -lsa /etc/ppp/peers/ppp103
 
+rm -f /usr/sbin/monitor.sh
+ln -f -s $path/monitor.sh /usr/sbin/monitor.sh
+ls -lsa /usr/sbin/monitor.sh
+
 #############################################

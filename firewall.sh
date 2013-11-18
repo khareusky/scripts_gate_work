@@ -6,13 +6,9 @@ source global.sh # подключение файла с переменными
 
 #########################################################################
 iptables -F INPUT_PROXY
-iptables -F INPUT_PPTP
-while read name server passwd ip iface proxy nat pptp temp; do
+while read $hosts_params; do
     if [ "$proxy" == "1" ]; then
         iptables -A INPUT_PROXY -s "$ip" -j ACCEPT
-    fi
-    if [ "$pptp" == "1" ]; then
-        iptables -A INPUT_PPTP -s "$ip" -j ACCEPT
     fi
 done < <(cat $path/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
 
