@@ -13,7 +13,7 @@
  tc qdisc del dev $int root
  tc qdisc del dev ifb0 root
 
-# exit 0;
+ exit 0;
  tc qdisc add dev $int root handle 1:0 htb default 5
  tc class add dev $int parent 1:0 classid 1:2 htb rate 100mbit burst 30k
  tc class add dev $int parent 1:2 classid 1:1 htb rate 20mbit burst 20k

@@ -26,3 +26,6 @@ fill "$ppp2"
 fill "$ppp3"
 
 ###########################################################
+ip rule add fwmark 1 table "$ppp1" prio 71 # правила для того чтобы пакеты уходили в нужные каналы
+ip rule add fwmark 2 table "$ppp2" prio 72
+ip rule add fwmark 3 table "$ppp3" prio 73

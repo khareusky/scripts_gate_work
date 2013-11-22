@@ -29,4 +29,10 @@ while read site channel; do
 	done < <(host "$site" | grep has | awk '{print $4}')
 done < <(cat $path/data/channel_dst_sites.txt | grep -v "^#" | grep "[^[:space:]]")
 
+# ACCESS DENIED
+$path/access_denied.sh
+
+# ACCESS ALLOWED
+$path/access_allowed.sh
+
 ##########################################

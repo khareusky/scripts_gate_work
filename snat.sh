@@ -1,16 +1,20 @@
 #!/bin/bash
 ###########################################################
-# Цикл по записи хостов в цепочку FORWARD_SNAT
-###########################################################
+# предоставление доступа перехода пакетов между сетевыми интерфейсами для проброса из ЛВС в сеть Интернет
 source global.sh
+chain_name="FORWARD_SNAT"
 
 ###########################################################
-### FILTER FORWARD_SNAT ###
- iptables -F FORWARD_SNAT
- while read $hosts_params; do
-    if [[ "$nat" == "1" ]]; then ### предоставление доступа перехода пакетов между сетевыми интерфейсами для проброса из ЛВС в сеть Интернет ###
-        iptables -A FORWARD_SNAT -s "$ip" -j ACCEPT
+# очистка и заполнение
+iptables -F "$chain_name"
+while read $hosts_params; do
+    if [[ "$nat" == "1" ]]; then 
+        iptables -A "$chain_name" -s "$ip" -j ACCEPT
     fi
- done < <(cat $path/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
+done < <(cat $path/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
+
+###########################################################
+# вывод
+log "\n`iptables-save -t filter | grep $chain_name`"
 
 ###########################################################

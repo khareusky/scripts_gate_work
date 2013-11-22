@@ -25,18 +25,14 @@ squid_second_channel_dst="$path/data/squid3_second_channel_dst.txt"
 squid_third_channel_dst="$path/data/squid3_third_channel_dst.txt"
 
 #########################################################################
-# вывод на консоль
-out="$1"
-output() {
-    if [[ -z "$out" ]]; then
-        echo "$script_name: $1";
-    fi
-}
-
-#########################################################################
-# вывод в файл
+# вывод
 log() {
-    echo "`date +%D\ %T` $script_name: $1" >> "$log_file";
+    ps x | grep -v grep | grep $$ | grep "+" >/dev/null # проверка на интерактивный запуск
+    if [[ "$?" == "0" ]]; then
+        echo -e "`date +%D\ %T` $script_name: $@"
+    else
+        logger -t "$script_name" "$@";
+    fi
 }
 
 #########################################################################

@@ -42,6 +42,8 @@ source global.sh
 
 ###########################################################
 ### SNAT ###
+ip rule add to 10.0.0.0/24 table main prio 20
+
 # очистка правил для NAT
  output "clear old rules"
  while read line; do
