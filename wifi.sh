@@ -1,7 +1,6 @@
 #!/bin/bash
 #####################################
 # скрипт по открытию доступа wifi сети
-#####################################
 source global.sh
 wifi="$ext1"
 wifi2="$ext3"
@@ -15,8 +14,8 @@ while read prio; do
 done < <( ip rule show | grep -e '^4[0-9]:' | cut -d ':' -f1)
 
 # заполнение данными
-ip rule add fwmark 4 table wifi prio 40
-ip rule add fwmark 5 table wifi2 prio 41
+ip rule add fwmark 4 table wifi prio 40 # чтобы ответные пакеты уходили по тому же каналу
+ip rule add fwmark 5 table wifi2 prio 41 # чтобы ответные пакеты уходили по тому же каналу
 ip rule add from "$wifi_lan" to "$int_lan" table main prio 42 # from wifi to LAN
 ip rule add from "$wifi_lan" to all table "$ppp1" prio 44 # from wifi to internet
 ip rule add from all to "$wifi_lan" table main prio 45 # from all to wifi
@@ -29,8 +28,7 @@ ip route flush cache table wifi
 ip route flush cache table wifi2
 
 # вывод
-output "new rules:
-`ip rule ls | grep -e '^4[0-9]:'`"
+log "\n`ip rule ls | grep -e '^4[0-9]:'`"
 
 #####################################
 # очистка правил iptables
@@ -49,8 +47,8 @@ iptables -A INPUT_WIFI -i "$wifi2" -s "$wifi_lan"  -m state --state NEW -p udp -
 iptables -A INPUT_WIFI -i "$wifi2" -p udp --dport 67 -j ACCEPT # allow dhcp for wifi2
 iptables -A INPUT_WIFI -i "$wifi2" -s "$wifi_lan" -m state --state NEW -p icmp -j ACCEPT # allow icmp for wifi2
 
-iptables -A FORWARD_WIFI -i "$wifi" -s "$wifi_lan" -j ACCEPT # открытие доступа для wifi в сеть Интернет и ЛВС
-iptables -A FORWARD_WIFI -i "$wifi2" -s "$wifi_lan" -j ACCEPT # открытие доступа для wifi2 в сеть Интернет и ЛВС
+iptables -A FORWARD_WIFI -i "$wifi" -s "$wifi_lan" -m state --state NEW -j ACCEPT # открытие доступа для wifi в сеть Интернет и ЛВС
+iptables -A FORWARD_WIFI -i "$wifi2" -s "$wifi_lan" -m state --state NEW -j ACCEPT # открытие доступа для wifi2 в сеть Интернет и ЛВС
 
 iptables -t nat -A POSTROUTING_WIFI -o "$int" -s "$wifi_lan" -d "$int_lan" -j SNAT --to-source "$int_addr" # SNAT wifi в ЛВС
 
@@ -61,7 +59,6 @@ iptables -t mangle -A PREROUTING_WIFI -i "$wifi" -s "$wifi_lan" -m state --state
 iptables -t mangle -A PREROUTING_WIFI -i "$wifi2" -s "$wifi_lan" -m state --state NEW -j CONNMARK --set-xmark 0x5/0xffffffff
 
 # вывод
-echo
-output "`iptables-save | grep WIFI`"
+log "\n`iptables-save | grep WIFI`"
 
 #####################################
