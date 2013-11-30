@@ -13,6 +13,7 @@ fi
 while [ true ]; do
     echo "`date +%D\ %T` $0: CONNECTING SSH TO 80.237.70.158" >> "$log_file"
     ssh -N -C svs_operator@80.237.70.158 -p 1786 -R 10254:127.0.0.1:22 -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -oServerAliveInterval=15 -oServerAliveCountMax=3 -oTCPKeepAlive=yes -oExitOnForwardFailure=yes -i "$path/data/id_rsa_80.237.70.158" 2>/dev/null;
+    ssh -N -C svs_operator@80.237.70.158 -p 1786 -R 22345:10.0.0.201:3389 -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -oServerAliveInterval=15 -oServerAliveCountMax=3 -oTCPKeepAlive=yes -oExitOnForwardFailure=yes -i "$path/data/id_rsa_80.237.70.158" 2>/dev/null;
     echo "`date +%D\ %T` $0: DISCONNECT SSH FROM 80.237.70.158" >> "$log_file"
     sleep 30;
 done

@@ -60,7 +60,10 @@ $path/proxy.sh # цикл, разрешающий требуемым хоста�
 #####################################
 # SNAT
 iptables -N FORWARD_SNAT 2>/dev/null
+iptables -t nat -N POSTROUTING_SNAT 2>/dev/null
+
 iptables -A FORWARD -i "$int" -s "$int_lan" -m state --state NEW -j FORWARD_SNAT # список ip адресов ЛВС, кому будет разрешен доступ в сеть Интернет по технологии NAT
+iptables -t nat -A POSTROUTING -j POSTROUTING_SNAT
 $path/snat.sh # заполнение цепочки данными; squid; ip rules
 
 #####################################
@@ -72,12 +75,15 @@ $path/log.sh # заполнение цепочки FORWARD_LOG хостами
 
 #####################################
 # WIFI
-# настройки для работы второй wifi точки
-ifconfig "$ext3" down
-ifconfig "$ext3" hw ether 00:50:bf:59:34:20
-ifconfig "$ext3" up
-ifconfig "$ext3":0 10.0.1.254/24
-/etc/init.d/dhcp3-server restart
+ip add show "$ext3" | grep "$ext3":0;
+if [ $? == 1 ]; then
+    # настройки для работы второй wifi точки
+    ifconfig "$ext3" down
+    ifconfig "$ext3" hw ether 00:50:bf:59:34:20
+    ifconfig "$ext3" up
+    ifconfig "$ext3":0 10.0.1.254/24
+    /etc/init.d/dhcp3-server restart
+fi
 
 iptables -N INPUT_WIFI 2>/dev/null
 iptables -N FORWARD_WIFI 2>/dev/null
