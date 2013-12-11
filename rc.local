@@ -7,7 +7,7 @@ $path/iptables.sh # для применение правил iptables
 $path/channel_src.sh script # распределение по каналам
 $path/channel_dst.sh script
 $path/rate/int.sh # ограничение по скорости
-$path/ssh_connect.sh& # поднимаем ssh туннель, через который будем получать доступ к данному шлюзу
+$path/remote_access.sh # удаленый доступ к данному шлюзу
 
 #####################################
 # скрипты для поддержания подключений в активном состоянии и проверка их с помощью пинга
@@ -17,11 +17,6 @@ sleep 2
 #sleep 2
 $path/check_ppp.sh "$ppp3" >/dev/null 2>&1 &
 sleep 2
-
-#####################################
-# start socks server
-export SS5_PASSWORD_FILE="/etc/ss5/ss5.passwd"
-/etc/init.d/ss5 start
 
 #####################################
 exit 0
