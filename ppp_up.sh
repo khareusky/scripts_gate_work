@@ -2,8 +2,6 @@
 #############################################################
 # Данный скрипт запускается при подключении одного из PPPoE каналов для доступа в сеть Интернет.
 source global.sh
-
-# LOG
 log "connect $PPP_IFACE: local ip = $PPP_LOCAL; remote ip = $PPP_REMOTE; dns1 = $DNS1; dns2 = $DNS2;"
 
 # ROUTE

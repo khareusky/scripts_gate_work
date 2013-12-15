@@ -6,6 +6,7 @@ source global.sh
 rate_down_default=2500
 rate_up_default=150
 uid=10
+log "begin"
 
 ################################################################
 ### INT ###
@@ -84,5 +85,7 @@ while read $hosts_params; do
     tc filter add dev ifb0 protocol ip parent 1:0 prio 3 u32 match ip src $ip match ip protocol 0x2f 0xff classid 1:"$(($uid+3))" # pptp
     tc filter add dev ifb0 protocol ip parent 1:0 prio 3 u32 match ip src $ip classid 1:"$(($uid+3))" # all
     let "uid = uid + 4"
-done < <(cat $path/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
+done < <(cat $hosts_file | grep -v "^#" | grep "[^[:space:]]")
 ################################################################
+log "end"
+

@@ -2,6 +2,7 @@
 #####################################
 # скрипт по открытию доступа wifi сети
 source global.sh
+log "begin"
 wifi="$ext1"
 wifi2="$ext3"
 wifi_addr="`ip addr show $wifi | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`"
@@ -58,7 +59,7 @@ iptables -t mangle -A FORWARD_WIFI -i "$wifi2" -s "$wifi_lan" ! -d "$int_lan" -m
 iptables -t mangle -A PREROUTING_WIFI -i "$wifi" -s "$wifi_lan" -m state --state NEW -j CONNMARK --set-xmark 0x4/0xffffffff
 iptables -t mangle -A PREROUTING_WIFI -i "$wifi2" -s "$wifi_lan" -m state --state NEW -j CONNMARK --set-xmark 0x5/0xffffffff
 
-# вывод
-log "\n`iptables-save | grep WIFI`"
-
 #####################################
+log "\n`iptables-save | grep WIFI`"
+log "end"
+

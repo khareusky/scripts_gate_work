@@ -1,6 +1,6 @@
 cls
 @echo off
-pushd \\10.0.0.52\share\proxy
+rem pushd \\10.0.0.52\share\proxy
 setlocal
 
 set /p name=Enter name: 
@@ -17,5 +17,5 @@ echo Failed!
 
 :end
 endlocal
-popd
+rem popd
 pause

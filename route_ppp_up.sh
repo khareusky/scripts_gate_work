@@ -1,25 +1,7 @@
 #!/bin/bash
 ########################################################################
 source global.sh
-
-########################################################################
-console() {
-	if [[ "$enable_out" == "1" ]]; then
-		echo "$1";
-	fi
-}
-########################################################################
-# проверка на ручной запуск
-enable_out="0";
-if [[ -z "$PPP_IFACE" ]]; then
-	enable_out="1";
-	if [[ -z "$1" ]]; then
-		console "USAGE: $0 ppp_iface";
-		exit 0;
-	fi
-	PPP_IFACE="$1";
-	PPP_LOCAL="`ip addr show $PPP_IFACE | grep inet -m 1 | awk '{print $2}'| cut -d '/' -f1`"
-fi
+log "begin"
 
 ########################################################################
 # Если идет обращение непосредственно к шлюзу, то ответные пакеты по тому же каналу
@@ -29,9 +11,9 @@ while read temp; do # очистка
 done < <(ip rule ls | grep ^10"$number")
 
 ip rule add from "$PPP_LOCAL" table "$PPP_IFACE" prio 10"$number";
-console "ip rule $ppp1 prio `ip rule | grep ^101`"
-console "ip rule $ppp2 prio `ip rule | grep ^102`"
-console "ip rule $ppp3 prio `ip rule | grep ^103`"
+log "ip rule $ppp1 prio `ip rule | grep ^101`"
+log "ip rule $ppp2 prio `ip rule | grep ^102`"
+log "ip rule $ppp3 prio `ip rule | grep ^103`"
 
 ########################################################################
 ### TABLES "ppp*" ###
@@ -45,19 +27,19 @@ if [ "`ip route ls table $ppp1`" == "" ]; then
 	ip route add default dev "$PPP_IFACE" table "$ppp1"
 	ip route flush cache table "$ppp1"
 fi
-console "ip route ls table $ppp1: `ip route ls table $ppp1`"
+log "ip route ls table $ppp1: `ip route ls table $ppp1`"
 
 if [ "`ip route ls table $ppp2`" == "" ]; then
 	ip route add default dev "$PPP_IFACE" table "$ppp2"
 	ip route flush cache table "$ppp2"
 fi
-console "ip route ls table $ppp2: `ip route ls table $ppp2`"
+log "ip route ls table $ppp2: `ip route ls table $ppp2`"
 
 if [ "`ip route ls table $ppp3`" == "" ]; then
 	ip route add default dev "$PPP_IFACE" table "$ppp3"
 	ip route flush cache table "$ppp3"
 fi
-console "ip route ls table $ppp3: `ip route ls table $ppp3`"
+log "ip route ls table $ppp3: `ip route ls table $ppp3`"
 
 ########################################################################
 ### TABLE "balance" ###
@@ -87,7 +69,7 @@ else if [[ "$PPP_REMOTE1" == "" && "$PPP_REMOTE2" != "" && "$PPP_REMOTE3" != "" 
 else
 	route add default dev "$PPP_IFACE" table balance; # когда подключился один канал
 fi fi fi fi
-console "ip route ls table balance: `ip route ls table balance`"
+log "ip route ls table balance: `ip route ls table balance`"
 
 ########################################################################
 ### TABLE "main" ###
@@ -96,3 +78,4 @@ if [[ -z "`ip route ls  | grep default`" ]]; then
 fi
 
 ########################################################################
+log "end"

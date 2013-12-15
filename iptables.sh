@@ -1,6 +1,7 @@
 #!/bin/bash
 #########################################################################
 source global.sh
+log "begin"
 
 #####################################
 # COMMON
@@ -114,4 +115,4 @@ iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark # перезапус
 iptables -t mangle -A OUTPUT -j CONNMARK --restore-mark
 
 #####################################
-
+log "end"

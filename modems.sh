@@ -1,6 +1,7 @@
 #!/bin/bash
 #####################################
 source global.sh
+log "begin"
 ext1_addr="`ip addr show $ext1 | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
 ext2_addr="`ip addr show $ext2 | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
 ext3_addr="`ip addr show $ext3 | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
@@ -47,3 +48,4 @@ log "\n`iptables-save | grep MODEM`"
 # настройки по модемам внесены непосредственно в сами конф файлы squid (tcp_outgoing_address.conf)
 
 #####################################
+log "end"

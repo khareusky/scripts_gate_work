@@ -3,6 +3,7 @@
 # сетевые политики безопасности, которые разрешают прохождение пакетам
 source global.sh
 chain_name="INPUT_PROXY"
+log "begin"
 
 #########################################################################
 # очистка и заполнение
@@ -11,7 +12,7 @@ while read $hosts_params; do
     if [ "$proxy" == "1" ]; then
         iptables -A "$chain_name" -s "$ip" -j ACCEPT
     fi
-done < <(cat $path/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
+done < <(cat $hosts_file | grep -v "^#" | grep "[^[:space:]]")
 
 # вывод
 log "\n`iptables-save -t filter | grep $chain_name`"
@@ -30,6 +31,6 @@ ip rule add to 10.1.0.254 table main prio 64
 ip rule add to 10.2.0.254 table main prio 65
 ip rule add to 10.3.0.254 table main prio 66
 
-# вывод
-log "\n`ip rule ls | grep -e '^6[0-9]:'`"
 ######################################################################### 
+log "\n`ip rule ls | grep -e '^6[0-9]:'`"
+log "end"

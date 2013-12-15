@@ -3,6 +3,7 @@
 # заполнение пользовательской цепочки FORWARD_LOG хостами ЛВС для протоколирования
 source global.sh
 chain_name="FORWARD_LOG"
+log "begin"
 
 #################################################################
 # очистка и заполнение
@@ -11,10 +12,8 @@ while read $hosts_params; do
     if [[ "$log" == "1" && "$nat" == "1" ]]; then
         iptables -t mangle -A "$chain_name" -s "$ip" -j ULOG --ulog-cprange 40
     fi
-done < <(cat $path/data/hosts.txt | grep -v "^#" | grep "[^[:space:]]")
+done < <(cat $hosts_file | grep -v "^#" | grep "[^[:space:]]")
 
 ############################################################
-# вывод
 log "\n`iptables-save -t mangle | grep $chain_name`"
-
-############################################################
+log "end"

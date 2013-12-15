@@ -3,6 +3,7 @@
 source global.sh
 iface="$PPP_IFACE"
 rate=6000
+log "begin"
 
 ################################################################################ 
 tc qdisc add dev $iface root handle 1:0 htb
@@ -31,3 +32,4 @@ tc filter add dev $iface protocol ip parent 1:0 prio 2 u32 match ip dport 3389 0
 tc filter add dev $iface protocol ip parent 1:0 prio 3 u32 match ip dst 0/0 flowid 1:12 # other
 
 ################################################################################
+log "end"

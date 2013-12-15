@@ -2,10 +2,11 @@
 #####################################
 source global.sh # подключение файла с переменными
 
+#####################################
 $path/sysctl.sh # для подключения необходимых модулей, для настройки системы, для увеличения быстродействия сети
-$path/iptables.sh # для применение правил iptables
-$path/channel_src.sh script # распределение по каналам
-$path/channel_dst.sh script
+$path/iptables.sh # для применения правил iptables
+$path/channel_src.sh # распределение по каналам
+$path/channel_dst.sh
 $path/rate.sh # ограничение по скорости
 $path/remote_access.sh # удаленый доступ к данному шлюзу
 

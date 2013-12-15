@@ -2,6 +2,7 @@
 ############################################################
 # Скрипт предназначен для предоставления удаленного доступа к данному серверу
 source global.sh
+log "begin"
 
 ############################################################
 # SSH REVERS
@@ -15,3 +16,4 @@ while read src_ip src_port dst_user dst_ip dst_port dst_key temp; do
 done < <(cat $path/data/ssh_remote_access.txt | grep -v "^#" | grep "[^[:space:]]")
 
 ############################################################
+log "end"
