@@ -43,7 +43,7 @@ ls -lsa /etc/ppp/ip-down.d/ppp_down
 # декодирование, декомпресия, деархифирование настроек
 echo "decrypt archive with data"
 mkdir $tmp
-gpg -o $tmp/$archive_name.tar.gz -d $path/$archive_name.tar.gz.gpg || ( echo "ERROR!!!"; rm -rf $tmp; exit 1; )
+gpg -o $tmp/$archive_name.tar.gz -d $path/$archive_name.tar.gz.gpg || exit 1
 tar -zxf $tmp/$archive_name.tar.gz -C $tmp/
 
 #############################################
@@ -68,14 +68,18 @@ ln -f $path/etc/danted.conf /etc/ # socks server
 ls -l /etc/danted.conf
 /etc/init.d/danted restart
 
-ln -sf $path/etc/squid3 /etc/squid3 # squid
+rm -rf /etc/squid3 # squid
+ln -sf $path/etc/squid3 /etc/squid3
 ls -l /etc/squid3
 /etc/init.d/squid3 reload
 
-ln -sf $path/etc/ppp/chap-secrets /etc/ppp/chap-secrets # ppp
+rm -rf /etc/ppp/peers # ppp
+ln -f $path/etc/ppp/chap-secrets /etc/ppp/chap-secrets
+chown root:root /etc/ppp/chap-secrets
+chmod 600 /etc/ppp/chap-secrets
 ln -sf $path/etc/ppp/peers /etc/ppp/peers
 ls -l /etc/ppp/chap-secrets
-ls -ld /etc/ppp/peers/
+ls -ld /etc/ppp/peers
 
 ln -sf $path/etc/iproute2/rt_tables /etc/iproute2/rt_tables # rt_tables
 ls -l /etc/iproute2/rt_tables

@@ -2,7 +2,9 @@
 #########################################################################
 # просмотр количества подключений каждого хоста
 source global.sh
+log "begin"
 
+#########################################################################
 while read $hosts_params; do
     if [[ "$nat" == "1" || "$proxy" == "1" ]]; then
         echo $ip: `conntrack -L 2>/dev/null | grep "ESTABLISHED src=$ip" -c`;
@@ -10,3 +12,4 @@ while read $hosts_params; do
 done < <(cat $hosts_file | grep -v "^#" | grep "[^[:space:]]")
 
 #########################################################################
+log "end"

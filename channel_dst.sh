@@ -2,6 +2,9 @@
 ###########################################################
 # распределение по каналам исходя из ip адресов назначения
 source global.sh
+squid_first_channel_dst="$path/etc/squid3/squid3_first_channel_dst.txt"
+squid_second_channel_dst="$path/etc/squid3/squid3_second_channel_dst.txt"
+squid_third_channel_dst="$path/etc/squid3/squid3_third_channel_dst.txt"
 config="$path/data/channel_dst.txt"
 log "begin"
 

@@ -2,6 +2,9 @@
 ###########################################################
 # распределение хостов по каналам из ip адресов ЛВС
 source global.sh
+squid_first_channel_src="$path/etc/squid3/squid3_first_channel_src.txt"
+squid_second_channel_src="$path/etc/squid3/squid3_second_channel_src.txt"
+squid_third_channel_src="$path/etc/squid3/squid3_third_channel_src.txt"
 log "begin"
 
 ###########################################################

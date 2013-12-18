@@ -18,13 +18,6 @@ int_lan="`ip addr show $int | grep inet -m 1 | awk '{print $2}'`"
 hosts_file="$path/data/hosts.txt"
 hosts_params="ip proxy nat channel rate_down rate_up log comment"
 
-squid_first_channel_src="$path/data/squid3_first_channel_src.txt"
-squid_second_channel_src="$path/data/squid3_second_channel_src.txt"
-squid_third_channel_src="$path/data/squid3_third_channel_src.txt"
-squid_first_channel_dst="$path/data/squid3_first_channel_dst.txt"
-squid_second_channel_dst="$path/data/squid3_second_channel_dst.txt"
-squid_third_channel_dst="$path/data/squid3_third_channel_dst.txt"
-
 #########################################################################
 log() {
     ps x | grep -v grep | grep $$ | grep "+" >/dev/null # проверка на интерактивный запуск
