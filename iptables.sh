@@ -22,6 +22,9 @@ iptables -P OUTPUT ACCEPT
 iptables -N BAD_PACKETS 2>/dev/null
 iptables -A INPUT -j BAD_PACKETS
 iptables -A FORWARD -j BAD_PACKETS
+iptables -A FORWARD -i "$int" -s "$int_lan" -d 10.0.0.0/8 -m state --state NEW -j DROP
+iptables -A FORWARD -i "$int" -s "$int_lan" -d 192.168.0.0/16 -m state --state NEW -j DROP
+iptables -A FORWARD -i "$int" -s "$int_lan" -d 172.25.0.0/16 -m state --state NEW -j DROP
 iptables -A OUTPUT -j BAD_PACKETS
 
 #####################################

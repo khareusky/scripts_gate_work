@@ -5,6 +5,7 @@ source global.sh
 log "begin"
 wifi="$ext1"
 wifi2="$ext3"
+ext="$ppp3"
 wifi_addr="`ip addr show $wifi | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`"
 wifi_lan="10.0.1.192/26"
 
@@ -18,7 +19,7 @@ done < <( ip rule show | grep -e '^4[0-9]:' | cut -d ':' -f1)
 ip rule add fwmark 4 table wifi prio 40 # чтобы ответные пакеты уходили по тому же каналу
 ip rule add fwmark 5 table wifi2 prio 41 # чтобы ответные пакеты уходили по тому же каналу
 ip rule add from "$wifi_lan" to "$int_lan" table main prio 42 # from wifi to LAN
-ip rule add from "$wifi_lan" to all table "$ppp1" prio 44 # from wifi to internet
+ip rule add from "$wifi_lan" to all table "$ext" prio 44 # from wifi to internet
 ip rule add from all to "$wifi_lan" table main prio 45 # from all to wifi
 
 ip route flush table wifi
@@ -62,4 +63,3 @@ iptables -t mangle -A PREROUTING_WIFI -i "$wifi2" -s "$wifi_lan" -m state --stat
 #####################################
 log "\n`iptables-save | grep WIFI`"
 log "end"
-

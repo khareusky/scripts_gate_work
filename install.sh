@@ -95,6 +95,8 @@ ln -sf $path/etc/.gitconfig /root/.gitconfig # git config
 chmod 600 /root/.gitconfig
 ls -l /root/.gitconfig
 
+echo "YOU SHOULD DEFENETILY ADD ACCOUNTS FROM $path/etc/passwd TO /etc/passwd!!!!"
+
 #############################################
 # удаление временной папки
 cd /
