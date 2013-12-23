@@ -58,6 +58,7 @@ ls -ld $path/data
 
 #############################################
 # замещение настроек
+exit 0;
 echo "replace configs"
 ln -f $path/etc/bind/named.conf.options /etc/bind/ # dns server
 chown root:root /etc/bind/named.conf.options

@@ -4,6 +4,20 @@ source global.sh
 log "begin"
 
 #####################################
+# modules
+/sbin/modprobe ip_nat_pptp
+/sbin/modprobe ip_tables
+/sbin/modprobe ip_conntrack
+/sbin/modprobe ip_conntrack_ftp
+/sbin/modprobe iptable_filter
+/sbin/modprobe iptable_mangle
+/sbin/modprobe iptable_nat
+/sbin/modprobe ip_nat_ftp
+/sbin/modprobe ipt_LOG
+/sbin/modprobe ipt_limit
+/sbin/modprobe ipt_state
+
+#####################################
 # COMMON
 iptables -F INPUT # очистка таблицы
 iptables -F FORWARD
@@ -86,7 +100,8 @@ if [ $? == 1 ]; then
     ifconfig "$ext3" hw ether 00:50:bf:59:34:20
     ifconfig "$ext3" up
     ifconfig "$ext3":0 10.0.1.254/24
-    /etc/init.d/dhcp3-server restart
+#    /etc/init.d/dhcp3-server restart
+    service isc-dhcp-server restart
 fi
 
 iptables -N INPUT_WIFI 2>/dev/null

@@ -10,20 +10,7 @@ log "begin"
 ip link set dev ifb0 up
 
 ##########################################################
-# iptables
-/sbin/modprobe ip_nat_pptp
-/sbin/modprobe ip_tables
-/sbin/modprobe ip_conntrack
-/sbin/modprobe ip_conntrack_ftp
-/sbin/modprobe iptable_filter
-/sbin/modprobe iptable_mangle
-/sbin/modprobe iptable_nat
-/sbin/modprobe ip_nat_ftp
-/sbin/modprobe ipt_LOG
-/sbin/modprobe ipt_limit
-/sbin/modprobe ipt_state
 
-##########################################################
 # Изменение параметров SYSCTL
 
 # Выключение rp_filter для всех интерфейсов:
@@ -42,6 +29,8 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 echo 1 > /proc/sys/net/ipv4/ip_dynaddr
 echo 0 > /proc/sys/net/ipv4/conf/all/rp_filter
 echo 0 > /proc/sys/net/ipv4/conf/default/rp_filter
+
+exit 0;
 
 # Увеличение размера очередей
 echo 32000000 > /proc/sys/net/ipv4/netfilter/ip_conntrack_max
