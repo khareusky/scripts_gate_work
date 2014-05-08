@@ -3,12 +3,17 @@
 script_name="`basename $0`"
 path="/opt/scripts_gate_work"
 log_file="/var/log/syslog"
-ext46_file="$path/data/ext46.txt"
+hosts="$path/data/hosts.txt"
 
 int="eth0"
-int_addr="`ip addr show $int | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`"
-int_lan="`ip addr show $int | grep inet -m 1 | awk '{print $2}'`"
+vokzal="tun0"
+mybox="eth1"
+interz="eth1.52"
 ssh_port="1786"
+
+#int_addr="`ip addr show $int | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`"
+#int_lan="`ip addr show $int | grep inet -m 1 | awk '{print $2}'`"
+
 
 #############################################
 log() {

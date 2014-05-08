@@ -35,36 +35,47 @@ echo 0 > /proc/sys/net/ipv4/conf/default/rp_filter
 # common iptables
 log "set up common iptables settings"
 
-iptables --flush -t filter
 iptables --flush -t nat
 iptables --flush -t mangle
+iptables --flush -t filter
 iptables --delete-chain
+
 
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A INPUT -p icmp -j ACCEPT
 iptables -A INPUT -p tcp --dport "$ssh_port" -j ACCEPT
 iptables -A INPUT -i "$int" -p udp --dport 53 -j ACCEPT
-iptables -A INPUT -j REJECT --reject-with icmp-net-unreachable
 iptables -P INPUT DROP
 
-iptables -N FORWARD_46
+
+iptables -N FORWARD_MYBOX
+iptables -N FORWARD_INTERZ
+iptables -N FORWARD_VOKZAL
 iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -A FORWARD -i "$int" -s 46.34.130.0/24 -j FORWARD_46
-iptables -A FORWARD -i "$int" -d 46.34.130.0/24 -j FORWARD_46
-iptables -A FORWARD -j REJECT --reject-with icmp-net-unreachable
+iptables -A FORWARD -j FORWARD_MYBOX
+iptables -A FORWARD -j FORWARD_INTERZ
+iptables -A FORWARD -j FORWARD_VOKZAL
 iptables -P FORWARD DROP
 
-iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-
 #####################################
-# 46.34.130.0/24
-$path/ext46.sh
+# nat
+$path/hosts.sh
+iptables -t nat -A POSTROUTING ! -s 80.237.70.158 -o $vokzal -j SNAT --to-source 80.237.70.158
+iptables -t nat -A POSTROUTING ! -s 62.32.67.38 -o $mybox -j SNAT --to-source 62.32.67.38
+iptables -t nat -A POSTROUTING ! -s 10.64.251.160 -o $interz -j SNAT --to-source 10.64.251.160
 
 #####################################
 # rate
 $path/rate.sh
 
 #####################################
+# logs
+$path/log.sh
 
+#####################################
+# ban_site_from_rkn.gov.ru
+python2.7 /gost-ssl/rzs/rules.py
+
+#####################################
 exit 0;
