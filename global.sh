@@ -3,7 +3,7 @@
 path="/opt/scripts_gate_work"
 source $path/config.sh
 int_iface="eth0"
-openvpn_iface="tun0"
+openvpn_iface="tap0"
 int_addr="`ip addr show $int_iface | grep inet -m 1 | awk '{print $2}' | cut -d '/' -f1`";
 int_lan="`ip addr show $int_iface | grep inet -m 1 | awk '{print $2}' | head -c -4 | cut -d . -f 1-3`.0/24"
 script_name="`basename $0`"

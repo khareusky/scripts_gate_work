@@ -39,7 +39,7 @@ iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-m
 
 ##########################################################
 # начальное состояние
-$path/openvpn_down.sh
+$path/stop_all.sh
 
 # запуск openvpn
 $path/check_openvpn.sh >/dev/null 2>&1 &

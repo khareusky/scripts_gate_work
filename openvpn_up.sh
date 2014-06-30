@@ -8,11 +8,13 @@ log "openvpn has just connected"
 #############################################
 # default route
 log "restart route to redirect traffic throw $openvpn_iface"
-ip route flush table main
-ip route add "$int_lan" dev "$int_iface"
-ip route add "$openvpn_lan" dev "$openvpn_iface"
-ip route add default dev "$openvpn_iface"
-ip route flush cache
+#ip route flush table main
+ip route del 10.0.0.1
+ip route del default via 10.0.0.130
+#ip route add "$int_lan" dev "$int_iface"
+#ip route add "$openvpn_lan" dev "$openvpn_iface"
+#ip route add default dev "$openvpn_iface"
+#ip route flush cache
 
 #############################################
 # iptables
@@ -36,7 +38,7 @@ iptables -t nat -A POSTROUTING ! -s "$openvpn_addr" -o "$openvpn_iface" -j SNAT 
 #############################################
 # dns
 log "restart dns to connect throw $openvpn_iface"
-/etc/init.d/bind9 restart
+/etc/init.d/bind9 start
 
 #############################################
 # socks

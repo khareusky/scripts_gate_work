@@ -4,7 +4,6 @@ source global.sh
 log "openvpn has just disconnected"
 
 #############################################
-# запуск скрипта по проверки валидности второго vpn
-$path/check_redirect_ip.sh&
+$path/stop_all.sh
 
 #############################################

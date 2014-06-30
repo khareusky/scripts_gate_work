@@ -7,6 +7,7 @@ source global.sh
 log "remove default route"
 ip route flush table main
 ip route add "$int_lan" dev "$int_iface"
+ip route add default dev "$int_iface" via 10.0.0.130
 ip route flush cache
 
 #############################################
